@@ -1,457 +1,924 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="BD Weed Killer">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#27ae60">
-    
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚁</text></svg>">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚁</text></svg>">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BD Weed Killer - Manejo Inteligente 🚁🌱</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TereCat</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-        :root { --primary: #27ae60; --secondary: #2ecc71; --dark: #2c3e50; --light: #ecf0f1; --danger: #e74c3c; --warning: #f39c12; }
-        body { font-family: 'Poppins', sans-serif; background-color: #e8f5e9; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: var(--dark); }
-        .app-container { background: #fff; width: 95%; max-width: 700px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); overflow: hidden; margin: 20px 0; }
-        .header { background: var(--primary); color: white; padding: 20px; text-align: center; font-size: 1.4em; font-weight: 600; }
-        .step { display: none; padding: 25px; animation: fadeIn 0.4s ease; }
-        .step.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .input-group { margin-bottom: 18px; }
-        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9em; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #bdc3c7; border-radius: 6px; box-sizing: border-box; font-family: inherit; font-size: 1em; }
-        input:focus, select:focus { outline: none; border-color: var(--primary); }
-        .btn { background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 6px; font-size: 1.1em; cursor: pointer; font-weight: 600; margin-top: 10px; transition: 0.2s; }
-        .btn:hover { background: #219653; }
-        .btn-secondary { background: #95a5a6; }
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Ubuntu:wght@400;700&display=swap');
         
-        /* Painel de Voo */
-        .flight-panel { background: #f8f9fa; border-left: 5px solid gray; padding: 15px; margin-top: 15px; border-radius: 4px; display: none; }
-        .status-badge { display: inline-block; padding: 5px 10px; border-radius: 4px; color: white; font-weight: bold; margin-bottom: 10px;}
+        body, html { 
+            margin: 0; padding: 0; width: 100vw; height: 100dvh; background-color: #1a1a1a; 
+            font-family: 'Ubuntu', sans-serif; overflow: hidden; color: white;
+            position: fixed; touch-action: none; /* Evita zoom e scroll no mobile */
+        }
         
-        /* Imagem da Daninha */
-        .img-container { text-align: center; margin-top: 15px; display: none; }
-        .img-container img { max-width: 100%; max-height: 250px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .img-caption { font-size: 0.8em; color: #7f8c8d; margin-top: 5px; }
+        /* Layout Flex para separar o jogo dos botões */
+        #game-container {
+            display: flex; flex-direction: column; width: 100vw; height: 100dvh;
+            background: #4ec0ca; position: relative;
+        }
 
-        /* Estilo Impressão (Relatório Final) */
-        #relatorio-final { font-family: 'Times New Roman', Times, serif; font-size: 12pt; color: black; display: none; }
-        .bloco { border: 1px solid #000; padding: 15px; margin-bottom: 15px; background: #fafafa; border-radius: 4px; }
-        .bloco h3 { margin-top: 0; border-bottom: 1px solid #ccc; padding-bottom: 5px; font-size: 14pt; }
-        .footer-print { text-align: center; font-size: 10pt; font-style: italic; color: #555; }
+        #top-bar {
+            display: none; justify-content: space-between; align-items: center; 
+            background: rgba(44, 62, 80, 0.9); padding: 5px 15px; border-bottom: 2px solid #d35400; 
+            width: 100%; box-sizing: border-box; z-index: 15; flex-shrink: 0;
+        }
+        .top-btn {
+            background: #e67e22; border: 2px solid #d35400; color: white; padding: 5px 10px;
+            font-size: 0.8rem; border-radius: 5px; font-weight: bold; cursor: pointer;
+        }
+
+        /* O canvas agora preenche apenas o espaço que sobra no meio da tela */
+        #canvas-wrapper { 
+            flex: 1; position: relative; width: 100%; min-height: 0; z-index: 5; overflow: hidden;
+        }
+        canvas { display: block; width: 100%; height: 100%; }
+
+        .screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(26, 26, 26, 0.95); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center; z-index: 20;
+            padding: 15px; box-sizing: border-box; overflow-y: auto;
+        }
         .hidden { display: none !important; }
 
-        @media print {
-            body * { visibility: hidden; }
-            .app-container { box-shadow: none; width: 100%; max-width: 100%; margin: 0; padding: 0; }
-            #step5, #relatorio-final, #relatorio-final * { visibility: visible; }
-            #relatorio-final { display: block; position: absolute; left: 0; top: 0; width: 100%; padding: 20px; box-sizing: border-box;}
-            .no-print { display: none !important; }
+        h1 { font-family: 'Press Start 2P', cursive; color: #f39c12; font-size: 1.5rem; line-height: 1.5; text-shadow: 3px 3px #c0392b; margin-bottom: 10px;}
+        h2 { color: #f1c40f; margin: 5px 0; font-size: 1.1rem; }
+
+        .form-group { margin-bottom: 10px; text-align: left; width: 280px; max-width: 100%; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; }
+        .form-group input { width: 100%; padding: 8px; border-radius: 5px; border: none; box-sizing: border-box; }
+        .form-group input[type="color"] { padding: 0; height: 35px; cursor: pointer; }
+
+        button.main-btn {
+            background: #e67e22; border: 2px solid #d35400; padding: 12px 25px; font-size: 1rem;
+            color: white; border-radius: 10px; cursor: pointer; font-family: 'Ubuntu', sans-serif;
+            font-weight: bold; margin-top: 10px; transition: 0.2s; -webkit-tap-highlight-color: transparent;
         }
+
+        /* O botão de áudio sutil */
+        #sound-toggle-btn {
+            margin-top: 20px; font-size: 2.5rem; cursor: pointer; 
+            text-shadow: 2px 2px 5px black; opacity: 0.8; transition: transform 0.2s;
+            -webkit-tap-highlight-color: transparent; user-select: none;
+        }
+        #sound-toggle-btn:active { transform: scale(0.9); }
+
+        #hud {
+            position: absolute; top: 10px; left: 10px; right: 10px; display: flex;
+            justify-content: space-between; align-items: center; z-index: 10; font-weight: bold; font-size: 0.9rem;
+            text-shadow: 1px 1px 2px black; pointer-events: none; flex-wrap: wrap; gap: 5px;
+        }
+        .lives { color: #e74c3c; font-size: 1.1rem; }
+        #turn-ui, #boss-ui { background: rgba(0,0,0,0.5); padding: 2px 8px; border-radius: 5px; color: #f1c40f; }
+        #boss-ui { color: #e74c3c; animation: pulse 1s infinite; display: none; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+        /* Controles Mobile ficam fixos embaixo, empurrando o jogo pra cima */
+        #mobile-controls {
+            display: none; width: 100%; padding: 10px 15px; box-sizing: border-box;
+            background: #222; border-top: 3px solid #d35400; flex-shrink: 0;
+            justify-content: space-between; align-items: center; z-index: 15;
+        }
+
+        @media (max-width: 900px) {
+            #mobile-controls { display: flex; }
+            h1 { font-size: 1.2rem; }
+        }
+
+        .dpad, .action-btns { display: flex; gap: 10px; }
+
+        .touch-btn {
+            background: #333; border: 2px solid #555; color: white; border-radius: 10px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: bold;
+            user-select: none; -webkit-user-select: none; touch-action: manipulation; width: 60px; height: 60px;
+        }
+        .touch-btn:active { background: #e67e22; border-color: #d35400; }
+        .game-btn { font-size: 0.7rem; line-height: 1.1; width: 65px; height: 65px; border-radius: 50%; }
+        
+        #victory-screen { background: rgba(0,0,0,0.4); }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <div class="header">🚁 BD Manejo Inteligente 🌱</div>
-
-    <div id="step1" class="step active">
-        <h3>📋 Passo 1: Identificação</h3>
-        <div class="input-group">
-            <label>👨‍💼 Profissional Responsável</label>
-            <input type="text" id="profissional" placeholder="Ex: Eng. Agrônomo Carlos Mendes">
-        </div>
-        <div class="input-group">
-            <label>🚜 Fazenda</label>
-            <input type="text" id="fazenda" placeholder="Ex: Fazenda Boa Esperança">
-        </div>
-        <div class="input-group">
-            <label>👨‍🌾 Proprietário</label>
-            <input type="text" id="proprietario" placeholder="Ex: João da Silva">
-        </div>
-        <div class="input-group">
-            <label>📅 Data da Aplicação</label>
-            <input type="date" id="dataApp">
-        </div>
-        <button class="btn" onclick="nextStep(1, 2)">Avançar ➡️</button>
+<div id="game-container">
+    <div id="top-bar">
+        <button class="top-btn" onclick="goToHome()">🏠 Início</button>
+        <button class="top-btn" id="pause-btn" onclick="togglePause()">⏸️ Pausa</button>
+        <button class="top-btn" onclick="saveGame()">💾 Salvar</button>
     </div>
 
-    <div id="step2" class="step">
-        <h3>🌍 Passo 2: Local e Cultura</h3>
-        <div class="input-group">
-            <label>📍 Estado (UF)</label>
-            <select id="estado" onchange="carregarMunicipios()"><option value="">Carregando...</option></select>
+    <div id="canvas-wrapper">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="hud" class="hidden">
+            <div><span id="phase-ui">Fase 1</span></div>
+            <div><span id="counter-ui">Progresso: 0/50</span></div>
+            <div id="turn-ui">☀️ Dia</div>
+            <div id="boss-ui">🚨 CHEFÃO!</div>
+            <div id="timer-ui">05:00</div>
+            <div class="lives" id="lives-ui">❤️❤️❤️❤️❤️❤️❤️</div>
         </div>
-        <div class="input-group">
-            <label>🏙️ Município</label>
-            <select id="municipio" disabled><option value="">Selecione o Estado primeiro</option></select>
-        </div>
-        <div class="input-group">
-            <label>🌾 Cultura Predominante (Maranhão)</label>
-            <select id="culturaSelect" onchange="checkOutroCultura()">
-                <option value="">Selecione a cultura/pastagem...</option>
-                <option value="Brachiaria brizantha (Marandu/Piatã/Xaraés)">Brachiaria brizantha (Marandu/Piatã)</option>
-                <option value="Panicum maximum (Mombaça/Zuri/Massai)">Panicum maximum (Mombaça/Zuri)</option>
-                <option value="Brachiaria ruziziensis">Brachiaria ruziziensis</option>
-                <option value="Brachiaria humidicola">Brachiaria humidicola</option>
-                <option value="Andropogon gayanus">Andropogon gayanus</option>
-                <option value="Cynodon spp. (Tifton/Cross)">Cynodon spp. (Tifton/Cross)</option>
-                <option value="Soja (Dessecação/Manejo pré-plantio)">Soja (Manejo pré-plantio)</option>
-                <option value="Milho (ILP - Integração Lavoura-Pecuária)">Milho (ILP)</option>
-                <option value="Eucalipto (ILPF - Sistema Silvipastoril)">Eucalipto (ILPF)</option>
-                <option value="Sorgo Forrageiro">Sorgo Forrageiro</option>
-                <option value="outro">Outro (Preencher manualmente)</option>
-            </select>
-        </div>
-        <div class="input-group hidden" id="divOutroCultura">
-            <label>✍️ Especifique a Cultura:</label>
-            <input type="text" id="culturaOutro" placeholder="Ex: Capim-buffel">
-        </div>
-        <button class="btn" onclick="nextStep(2, 3)">Avançar ➡️</button>
-        <button class="btn btn-secondary" onclick="nextStep(2, 1)">⬅️ Voltar</button>
     </div>
 
-    <div id="step3" class="step">
-        <h3>🌤️ Passo 3: Decisão de Voo (T25p)</h3>
-        <p style="font-size: 0.85em; color: #555;">Insira os dados climáticos atuais para obter os parâmetros de voo.</p>
-        <div class="input-group">
-            <label>🌡️ Temperatura (°C)</label>
-            <input type="number" id="temp" placeholder="Ex: 28" oninput="calcularVoo()">
+    <div id="mobile-controls">
+        <div class="dpad">
+            <div class="touch-btn" id="pad-left" style="font-size: 1.5rem;">◀</div>
+            <div class="touch-btn" id="pad-right" style="font-size: 1.5rem;">▶</div>
         </div>
-        <div class="input-group">
-            <label>💧 Umidade Relativa (%)</label>
-            <input type="number" id="umid" placeholder="Ex: 60" oninput="calcularVoo()">
+        <div class="action-btns">
+            <div class="touch-btn game-btn" id="pad-duck"><div>▼</div><div>BAIXAR</div></div>
+            <div class="touch-btn game-btn" id="pad-jump" style="background: #d35400;"><div>▲</div><div>PULAR</div></div>
         </div>
-        <div class="input-group">
-            <label>💨 Velocidade do Vento (km/h)</label>
-            <input type="number" id="vento" placeholder="Ex: 8" oninput="calcularVoo()">
+    </div>
+
+    <div id="start-screen" class="screen">
+        <h1>TereCat</h1>
+        <div class="form-group">
+            <label>Nome do Gatinho:</label>
+            <input type="text" id="cat-name" value="Caju" maxlength="15">
+        </div>
+        <div class="form-group">
+            <label>Cor da Pelagem:</label>
+            <input type="color" id="cat-fur" value="#e67e22">
+        </div>
+        <div class="form-group">
+            <label>Cor dos Olhos:</label>
+            <input type="color" id="cat-eye" value="#2ecc71">
         </div>
         
-        <div id="flightPanel" class="flight-panel">
-            <div id="flightStatus" class="status-badge"></div>
-            <p id="flightMsg" style="font-size: 0.9em; margin-top: 5px;"></p>
-            <hr style="border-top: 1px solid #ddd;">
-            <p style="margin:5px 0; font-size: 0.9em;"><strong>Ajustes Agras T25p:</strong></p>
-            <ul style="margin: 0; padding-left: 20px; font-size: 0.9em;" id="flightParams">
-            </ul>
-        </div>
+        <div id="sound-toggle-btn">🔊</div>
+        <p style="font-size: 0.7rem; color: #ccc; margin-top: 0; margin-bottom: 15px;">Toque para Ligar/Desligar o Som</p>
 
-        <button class="btn" onclick="validarPasso3()">Avançar ➡️</button>
-        <button class="btn btn-secondary" onclick="nextStep(3, 2)">⬅️ Voltar</button>
+        <button class="main-btn" id="start-btn">Começar Aventura</button>
+        <button class="main-btn" style="background: #2980b9;" id="load-btn">Carregar Jogo Salvo</button>
     </div>
 
-    <div id="step4" class="step">
-        <h3>🎯 Passo 4: Alvo Biológico</h3>
-        <div class="input-group">
-            <label>🌿 Selecione a Planta Daninha</label>
-            <select id="daninhaSelect" onchange="selecionarDaninha()">
-                <option value="">Selecione na lista (70 opções)...</option>
-            </select>
-        </div>
-        
-        <div id="imgContainer" class="img-container">
-            <img id="weedImg" src="" alt="Foto da Planta">
-            <div class="img-caption" id="weedCaption">Imagem obtida via repositório público (Wikipedia)</div>
-        </div>
-
-        <div class="input-group hidden" id="divOutroDaninha" style="margin-top: 15px;">
-            <label>✍️ Preencha Manualmente (Daninha | Herbicida | Dose | Vol.):</label>
-            <input type="text" id="daninhaOutro" placeholder="Ex: Capim-amargoso | Glifosato | 2L/ha | 15L">
-        </div>
-
-        <button class="btn" onclick="gerarRelatorio()">Gerar Relatório Final 🚀</button>
-        <button class="btn btn-secondary" onclick="nextStep(4, 3)">⬅️ Voltar</button>
+    <div id="pause-screen" class="screen hidden" style="background: rgba(0,0,0,0.8);">
+        <h1>JOGO PAUSADO</h1>
+        <button class="main-btn" onclick="togglePause()">Continuar</button>
     </div>
 
-    <div id="step5" class="step">
-        <div class="no-print" style="text-align: center; margin-bottom: 20px;">
-            <h3>✅ Relatório Gerado com Sucesso!</h3>
-            <p style="font-size: 0.9em; color: #555;">Revise os dados antes de exportar.</p>
-        </div>
+    <div id="phase-screen" class="screen hidden">
+        <h1 id="phase-title">Fase Concluída!</h1>
+        <h2 id="phase-reward">Recompensa: Coleira</h2>
+        <p>O gato está ficando mais forte e confiante! (+1 Vida Extra)</p>
+        <button class="main-btn" onclick="nextPhase()">Ir para próxima Fase</button>
+    </div>
 
-        <div id="relatorio-final">
-            <h2 style="text-align: center; border-bottom: 2px solid #27ae60; padding-bottom: 10px;">RELATÓRIO DE APLICAÇÃO AÉREA - DRONE AGRAS T25P</h2>
-            
-            <div class="bloco">
-                <h3>📋 1. Identificação</h3>
-                <p><strong>Profissional Responsável:</strong> <span id="r_prof"></span></p>
-                <p><strong>Fazenda:</strong> <span id="r_faz"></span> | <strong>Proprietário:</strong> <span id="r_prop"></span></p>
-                <p><strong>Data:</strong> <span id="r_data"></span></p>
-            </div>
+    <div id="game-over" class="screen hidden">
+        <h1>As Vidas se foram...</h1>
+        <p>A rua foi cruel hoje. Mas você pode tentar de novo!</p>
+        <button class="main-btn" onclick="location.reload()">Recomeçar</button>
+    </div>
 
-            <div class="bloco">
-                <h3>🌍 2. Área e Condições Operacionais</h3>
-                <p><strong>Localidade:</strong> <span id="r_local"></span></p>
-                <p><strong>Cultura/Pastagem:</strong> <span id="r_cult"></span></p>
-                <p><strong>Clima Atual:</strong> <span id="r_clima"></span></p>
-                <p><strong>Decisão Operacional:</strong> <span id="r_decisao"></span></p>
-                <p><strong>Parâmetros de Voo (T25p):</strong> <span id="r_params"></span></p>
-            </div>
-
-            <div class="bloco" style="background-color: #e8f5e9; border-color: #27ae60;">
-                <h3>🎯 3. Prescrição Fitossanitária</h3>
-                <p><strong>Alvo Biológico:</strong> <span id="r_alvo"></span></p>
-                <p><strong>Herbicida Recomendado:</strong> <span id="r_herb"></span></p>
-                <p><strong>Modo de Ação:</strong> <span id="r_acao"></span></p>
-                <p><strong>Sintoma Esperado:</strong> <span id="r_sint"></span></p>
-                <p><strong>Efeito Residual:</strong> <span id="r_resid"></span></p>
-                <p><strong>Dosagem do Produto:</strong> <strong><span id="r_dose"></span></strong></p>
-                <p><strong>Volume de Calda (Drone):</strong> <strong><span id="r_vol"></span></strong></p>
-                <hr style="border-top: 1px dashed #27ae60; margin: 15px 0;">
-                <p style="font-size: 11pt;"><em>⚠️ Atenção: Configurar bicos centrífugos para gotas médias a grossas (250-350 micras). Uso OBRIGATÓRIO de adjuvante compatível na calda.</em></p>
-            </div>
-            <p class="footer-print">Documento gerado eletronicamente via AgroDrone Target - Válido como registro de Setup de Voo.</p>
-        </div>
-        
-        <button class="btn no-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
-        <button class="btn btn-secondary no-print" onclick="location.reload()">🔄 Iniciar Novo Cadastro</button>
+    <div id="victory-screen" class="screen hidden">
+        <h1>Você chegou!</h1>
+        <h2 style="color: white; text-shadow: 2px 2px black;">O TereCat completou o grande desafio das 20 fases e encontrou sua família definitiva!</h2>
+        <button class="main-btn" onclick="location.reload()" style="margin-top: 40px;">Jogar Novamente</button>
     </div>
 </div>
 
 <script>
-    // --- 1. BANCO DE DADOS COMPLETO (70 DANINHAS) ---
-    const bdDaninhas = [
-        { id: 1, n: "Guanxuma", c: "Sida rhombifolia", h: "Tordon (2,4-D + Picloram)", a: "Sistêmico", s: "Epinastia e murcha", r: "Longo (6-12 meses)", d: "4,0 a 5,0 L/ha", v: "15 a 20 L/ha" },
-        { id: 2, n: "Malva-branca", c: "Sida cordifolia", h: "Tordon (2,4-D + Picloram)", a: "Sistêmico", s: "Epinastia foliar e morte", r: "Longo (6-12 meses)", d: "4,0 a 5,0 L/ha", v: "15 a 20 L/ha" },
-        { id: 3, n: "Assa-peixe", c: "Vernonia polyanthes", h: "Trueno (Aminopiralide + Fluroxipir)", a: "Sistêmico", s: "Necrose foliar", r: "Muito longo (12-24 meses)", d: "2,0 a 3,0 L/ha", v: "20 a 25 L/ha" },
-        { id: 4, n: "Amendoim-bravo", c: "Euphorbia heterophylla", h: "Aminol (2,4-D)", a: "Sistêmico", s: "Epinastia e perda de turgor", r: "Muito curto (7-30 dias)", d: "1,5 a 2,5 L/ha", v: "15 L/ha" },
-        { id: 5, n: "Dormideira", c: "Mimosa pudica", h: "Tordon (2,4-D + Picloram)", a: "Sistêmico", s: "Desfolha", r: "Longo (6-12 meses)", d: "3,0 a 4,0 L/ha", v: "15 a 20 L/ha" },
-        { id: 6, n: "Malícia", c: "Mimosa invisa", h: "Tordon (2,4-D + Picloram)", a: "Sistêmico", s: "Epinastia severa", r: "Longo (6-12 meses)", d: "3,0 a 4,0 L/ha", v: "15 a 20 L/ha" },
-        { id: 7, n: "Leiteiro", c: "Euphorbia heterophylla", h: "DMA 806 (2,4-D)", a: "Sistêmico", s: "Retorcimento e exsudação", r: "Muito curto", d: "1,5 a 2,5 L/ha", v: "15 L/ha" },
-        { id: 8, n: "Arranha-gato (Jovem)", c: "Acacia plumosa", h: "Padron / Dominum", a: "Sistêmico", s: "Seca dos ponteiros", r: "Curto (30-60 dias)", d: "2,0 a 3,0 L/ha", v: "25 a 30 L/ha" },
-        { id: 9, n: "Mata-pasto", c: "Senna obtusifolia", h: "Tordon (2,4-D + Picloram)", a: "Sistêmico", s: "Rachadura no caule", r: "Longo (6-12 meses)", d: "3,0 a 4,0 L/ha", v: "15 a 20 L/ha" },
-        { id: 10, n: "Fedegoso", c: "Senna occidentalis", h: "Tordon (2,4-D + Picloram)", a: "Sistêmico", s: "Epinastia e seca", r: "Longo (6-12 meses)", d: "3,0 a 4,0 L/ha", v: "15 a 20 L/ha" },
-        { id: 11, n: "Vassourinha-de-botão", c: "Spermacoce verticillata", h: "Ally + DMA", a: "Sistêmico", s: "Paralisação de crescimento", r: "Médio (30-60 dias)", d: "10g + 1,5 L/ha", v: "15-20 L/ha + Óleo" },
-        { id: 12, n: "Jurubeba (Jovem)", c: "Solanum paniculatum", h: "Tordon (2,4-D + Picloram)", a: "Sistêmico", s: "Murcha e retorcimento", r: "Longo (6-12 meses)", d: "4,0 a 6,0 L/ha", v: "25 a 30 L/ha" },
-        { id: 13, n: "Joá-bravo", c: "Solanum viarum", h: "Tordon (2,4-D + Picloram)", a: "Sistêmico", s: "Engrossamento do caule", r: "Longo (6-12 meses)", d: "4,0 a 5,0 L/ha", v: "20 a 25 L/ha" },
-        { id: 14, n: "Pinhão-manso (Rebrota)", c: "Jatropha curcas", h: "Trueno (Aminopiralide+Fluroxipir)", a: "Sistêmico", s: "Enrolamento, seca do lenho", r: "Muito longo", d: "2,0 a 3,0 L/ha", v: "20 a 25 L/ha" },
-        { id: 15, n: "Bucha", c: "Luffa operculata", h: "Aminol (2,4-D)", a: "Sistêmico", s: "Secamento de gavinhas", r: "Muito curto", d: "1,5 a 2,5 L/ha", v: "15 a 20 L/ha" },
-        { id: 16, n: "Ciganinha", c: "Memora peregrina", h: "Dominum", a: "Sistêmico", s: "Murcha foliar imediata", r: "Muito longo", d: "2,0 a 2,5 L/ha", v: "20 L/ha" },
-        { id: 17, n: "Espinho-de-vassoura", c: "Sida spinosa", h: "Tordon (2,4-D + Picloram)", a: "Sistêmico", s: "Epinastia e seca", r: "Longo (6-12 meses)", d: "3,5 a 4,5 L/ha", v: "15 a 20 L/ha" },
-        { id: 18, n: "Carrapicho-de-carneiro", c: "Acanthospermum hispidum", h: "DMA 806 (2,4-D)", a: "Sistêmico", s: "Clorose e seca", r: "Muito curto", d: "1,0 a 1,5 L/ha", v: "15 L/ha" },
-        { id: 19, n: "Carrapicho-beiço-de-boi", c: "Desmodium adscendens", h: "Tordon (2,4-D + Picloram)", a: "Sistêmico", s: "Epinastia em ramos rasteiros", r: "Longo", d: "3,0 a 4,0 L/ha", v: "15 a 20 L/ha" },
-        { id: 20, n: "Carrapicho-de-agulha", c: "Bidens pilosa", h: "U46 BR (2,4-D)", a: "Sistêmico", s: "Retorcimento rápido", r: "Muito curto", d: "1,0 a 1,5 L/ha", v: "15 L/ha" },
-        { id: 21, n: "Erva-de-santa-maria", c: "Dysphania ambrosioides", h: "Aminol (2,4-D)", a: "Sistêmico", s: "Engrossamento dos nós", r: "Muito curto", d: "1,5 a 2,0 L/ha", v: "15 L/ha" },
-        { id: 22, n: "Cordão-de-frade", c: "Leonotis nepetifolia", h: "Tordon (2,4-D + Picloram)", a: "Sistêmico", s: "Clorose e morte do caule", r: "Longo", d: "3,0 a 4,0 L/ha", v: "20 L/ha" },
-        { id: 23, n: "Poaia-branca", c: "Richardia brasiliensis", h: "Ally (Metsulfurom)", a: "Sistêmico", s: "Paralisação e necrose", r: "Médio", d: "5 a 8 g/ha", v: "15 L/ha + Adjuvante" },
-        { id: 24, n: "Maria-mole", c: "Senecio brasiliensis", h: "Tordon (2,4-D + Picloram)", a: "Sistêmico", s: "Epinastia agressiva", r: "Longo", d: "4,0 a 5,0 L/ha", v: "20 L/ha" },
-        { id: 25, n: "Picão-preto", c: "Bidens subalternans", h: "DMA 806 (2,4-D)", a: "Sistêmico", s: "Murcha severa", r: "Muito curto", d: "1,0 a 1,5 L/ha", v: "15 L/ha" },
-        { id: 26, n: "Falso-alecrim", c: "Baccharis dracunculifolia", h: "Trueno", a: "Sistêmico", s: "Seca dos ramos", r: "Muito longo", d: "2,5 a 3,0 L/ha", v: "25 a 30 L/ha" },
-        { id: 27, n: "Samambaia", c: "Pteridium aquilinum", h: "Ally (Metsulfurom)", a: "Sistêmico", s: "Clorose nas frondes", r: "Médio", d: "10 a 15 g/ha", v: "20 L/ha + Óleo Mineral" },
-        { id: 28, n: "Sazzu", c: "Cissus sicyoides", h: "Tordon", a: "Sistêmico", s: "Retorcimento lianas", r: "Longo", d: "4,0 a 5,0 L/ha", v: "20 a 25 L/ha" },
-        { id: 29, n: "Angiquinho", c: "Desmanthus virgatus", h: "Jaguar", a: "Sistêmico", s: "Desfolha", r: "Muito longo", d: "2,0 a 3,0 L/ha", v: "20 L/ha" },
-        { id: 30, n: "Unha-de-gato (Rebrota)", c: "Acacia bonariensis", h: "Padron", a: "Sistêmico", s: "Seca de ponteiros", r: "Curto", d: "2,5 a 3,5 L/ha", v: "25 a 30 L/ha" },
-        { id: 31, n: "Serralha", c: "Sonchus oleraceus", h: "Aminol (2,4-D)", a: "Sistêmico", s: "Retorcimento e murcha", r: "Muito curto", d: "1,0 a 1,5 L/ha", v: "15 L/ha" },
-        { id: 32, n: "Tanchagem", c: "Plantago major", h: "U46 BR (2,4-D)", a: "Sistêmico", s: "Secamento rasteiro", r: "Muito curto", d: "1,5 a 2,0 L/ha", v: "15 a 20 L/ha" },
-        { id: 33, n: "Losna-branca", c: "Artemisia verlotiorum", h: "Tordon", a: "Sistêmico", s: "Epinastia total", r: "Longo", d: "3,0 a 4,0 L/ha", v: "20 L/ha" },
-        { id: 34, n: "Mentrasto", c: "Ageratum conyzoides", h: "DMA 806", a: "Sistêmico", s: "Amarelecimento", r: "Muito curto", d: "1,0 a 1,5 L/ha", v: "15 L/ha" },
-        { id: 35, n: "Erva-de-touro", c: "Tridax procumbens", h: "Tordon", a: "Sistêmico", s: "Retorcimento da haste", r: "Longo", d: "3,0 a 4,0 L/ha", v: "15 a 20 L/ha" },
-        { id: 36, n: "Apaga-fogo", c: "Alternanthera tenella", h: "Tordon", a: "Sistêmico", s: "Epinastia rasteira", r: "Longo", d: "3,0 a 4,0 L/ha", v: "15 a 20 L/ha" },
-        { id: 37, n: "Amora-preta", c: "Rubus urticifolius", h: "Trueno", a: "Sistêmico", s: "Clorose e necrose", r: "Muito longo", d: "2,5 a 3,0 L/ha", v: "25 a 30 L/ha" },
-        { id: 38, n: "Velame", c: "Croton heliotropiifolius", h: "Tordon", a: "Sistêmico", s: "Desfolha e seca", r: "Longo", d: "4,0 a 5,0 L/ha", v: "20 a 25 L/ha" },
-        { id: 39, n: "Marmeleiro", c: "Croton sonderianus", h: "Dominum", a: "Sistêmico", s: "Seca ramos", r: "Muito longo", d: "2,0 a 2,5 L/ha", v: "20 a 25 L/ha" },
-        { id: 40, n: "Pimenta-de-macaco", c: "Piper aduncum", h: "Tordon", a: "Sistêmico", s: "Queda foliar", r: "Longo", d: "4,0 a 6,0 L/ha", v: "25 L/ha" },
-        { id: 41, n: "Chá-de-pedra", c: "Stachytarpheta cayennensis", h: "Jaguar", a: "Sistêmico", s: "Aborto floral", r: "Muito longo", d: "2,0 a 3,0 L/ha", v: "20 L/ha" },
-        { id: 42, n: "Gervão-azul", c: "Stachytarpheta jamaicensis", h: "Tordon", a: "Sistêmico", s: "Retorcimento", r: "Longo", d: "3,0 a 4,0 L/ha", v: "20 L/ha" },
-        { id: 43, n: "Cordas-de-viola", c: "Ipomoea purpurea", h: "Aminol", a: "Sistêmico", s: "Enrolamento agudo", r: "Muito curto", d: "1,5 a 2,0 L/ha", v: "15 a 20 L/ha" },
-        { id: 44, n: "Jitirana", c: "Ipomoea cairica", h: "DMA 806", a: "Sistêmico", s: "Morte das lianas", r: "Muito curto", d: "1,5 a 2,0 L/ha", v: "15 a 20 L/ha" },
-        { id: 45, n: "Merremia", c: "Merremia aegyptia", h: "U46 BR", a: "Sistêmico", s: "Desfolha", r: "Muito curto", d: "1,5 a 2,0 L/ha", v: "15 L/ha" },
-        { id: 46, n: "Feijão-de-rola", c: "Macroptilium lathyroides", h: "Tordon", a: "Sistêmico", s: "Engrossamento caulinar", r: "Longo", d: "3,0 a 4,0 L/ha", v: "20 L/ha" },
-        { id: 47, n: "Centrosema", c: "Centrosema pubescens", h: "Tordon", a: "Sistêmico", s: "Morte radicular", r: "Longo", d: "3,0 a 4,0 L/ha", v: "20 L/ha" },
-        { id: 48, n: "Calopogônio", c: "Calopogonium mucunoides", h: "Tordon", a: "Sistêmico", s: "Epinastia foliar", r: "Longo", d: "3,0 a 4,0 L/ha", v: "20 L/ha" },
-        { id: 49, n: "Melão-de-são-caetano", c: "Momordica charantia", h: "Aminol", a: "Sistêmico", s: "Seca das gavinhas", r: "Muito curto", d: "1,5 a 2,0 L/ha", v: "15 L/ha" },
-        { id: 50, n: "Tiririca", c: "Cyperus rotundus", h: "Ally (Metsulfurom)", a: "Sistêmico", s: "Bulbos escurecem", r: "Médio", d: "5 a 10 g/ha", v: "15 a 20 L/ha + Óleo" },
-        { id: 51, n: "Junquinho", c: "Cyperus esculentus", h: "Zartan", a: "Sistêmico", s: "Murcha geral", r: "Médio", d: "5 a 10 g/ha", v: "15 a 20 L/ha + Óleo" },
-        { id: 52, n: "Vassourinha-doce", c: "Scoparia dulcis", h: "Ally", a: "Sistêmico", s: "Amarelecimento apical", r: "Médio", d: "8 a 12 g/ha", v: "15 L/ha + Óleo" },
-        { id: 53, n: "Quebra-pedra", c: "Phyllanthus niruri", h: "Aminol", a: "Sistêmico", s: "Folhas caem", r: "Muito curto", d: "1,0 a 1,5 L/ha", v: "15 L/ha" },
-        { id: 54, n: "Bredo/Caruru", c: "Amaranthus spinosus", h: "DMA 806", a: "Sistêmico", s: "Espessamento do caule", r: "Muito curto", d: "1,0 a 1,5 L/ha", v: "15 a 20 L/ha" },
-        { id: 55, n: "Caruru-de-espinho", c: "Amaranthus viridis", h: "Aminol", a: "Sistêmico", s: "Retorcimento completo", r: "Muito curto", d: "1,0 a 1,5 L/ha", v: "15 a 20 L/ha" },
-        { id: 56, n: "Pé-de-pinto", c: "Boerhavia diffusa", h: "Jaguar", a: "Sistêmico", s: "Epinastia de ramos", r: "Muito longo", d: "2,0 a 2,5 L/ha", v: "15 a 20 L/ha" },
-        { id: 57, n: "Erva-quente", c: "Spermacoce alata", h: "Ally", a: "Sistêmico", s: "Clorose apical", r: "Médio", d: "5 a 10 g/ha", v: "15 L/ha" },
-        { id: 58, n: "Falsa-serralha", c: "Emilia sonchifolia", h: "Aminol", a: "Sistêmico", s: "Perda de turgescência", r: "Muito curto", d: "1,0 a 1,5 L/ha", v: "15 L/ha" },
-        { id: 59, n: "Picão-branco", c: "Galinsoga parviflora", h: "DMA 806", a: "Sistêmico", s: "Ressecamento", r: "Muito curto", d: "1,0 a 1,5 L/ha", v: "15 L/ha" },
-        { id: 60, n: "Botão-de-ouro", c: "Spilanthes oleracea", h: "Jaguar", a: "Sistêmico", s: "Enrolamento", r: "Muito longo", d: "2,0 a 2,5 L/ha", v: "15 a 20 L/ha" },
-        { id: 61, n: "Mastruz", c: "Chenopodium ambrosioides", h: "U46 BR", a: "Sistêmico", s: "Necrose foliar", r: "Muito curto", d: "1,5 L/ha", v: "15 L/ha" },
-        { id: 62, n: "Trapoeraba", c: "Commelina benghalensis", h: "Starane (Fluroxipir)", a: "Sistêmico", s: "Caule aquoso apodrecido", r: "Curto", d: "0,5 a 1,0 L/ha", v: "20 L/ha" },
-        { id: 63, n: "Margaridinha", c: "Chrysanthemum leucanthemum", h: "Tordon", a: "Sistêmico", s: "Desidratação rápida", r: "Longo", d: "3,5 a 4,5 L/ha", v: "20 L/ha" },
-        { id: 64, n: "Língua-de-vaca", c: "Chaptalia nutans", h: "Aminol", a: "Sistêmico", s: "Roseta murcha", r: "Muito curto", d: "1,5 a 2,0 L/ha", v: "15 L/ha" },
-        { id: 65, n: "Orelha-de-urso", c: "Elephantopus mollis", h: "Tordon", a: "Sistêmico", s: "Murcha basais", r: "Longo", d: "4,0 a 5,0 L/ha", v: "20 L/ha" },
-        { id: 66, n: "Erva-de-são-joão", c: "Hypericum perforatum", h: "Trueno", a: "Sistêmico", s: "Ramos ressecados", r: "Muito longo", d: "2,0 a 3,0 L/ha", v: "25 L/ha" },
-        { id: 67, n: "Salgadeira", c: "Pothomorphe umbellata", h: "Tordon", a: "Sistêmico", s: "Morte foliar", r: "Longo", d: "4,0 a 5,0 L/ha", v: "20 L/ha" },
-        { id: 68, n: "Fumo-bravo", c: "Solanum mauritianum", h: "Grazon", a: "Sistêmico", s: "Queda de folhas", r: "Muito longo", d: "2,5 a 3,5 L/ha", v: "25 a 30 L/ha" },
-        { id: 69, n: "Gema-de-ovo", c: "Ludwigia octovalvis", h: "DMA 806", a: "Sistêmico", s: "Retorcimento severo", r: "Muito curto", d: "1,5 a 2,0 L/ha", v: "15 a 20 L/ha" },
-        { id: 70, n: "Aguapé", c: "Eichhornia crassipes", h: "DMA 806", a: "Sistêmico", s: "Planta afunda", r: "Muito curto", d: "2,0 a 3,0 L/ha", v: "20 a 25 L/ha" }
+    // --- MOTOR DE ÁUDIO (Blindado para Celulares) ---
+    let audioCtx;
+    let audioUnlocked = false;
+    let soundEnabled = true;
+    let bgmTimeout;
+
+    const bgmNotes = [392, 349, 330, 294, 330, 349, 392, 392, 392, 440, 392, 349, 330, 349, 349, 349];
+    const bgmTempos = [250, 250, 250, 250, 250, 250, 250, 250, 500, 250, 250, 250, 250, 250, 250, 500];
+    let bgmIndex = 0;
+
+    // Alternador Visível de Som
+    const soundToggleBtn = document.getElementById('sound-toggle-btn');
+    soundToggleBtn.addEventListener('click', (e) => {
+        soundEnabled = !soundEnabled;
+        soundToggleBtn.innerText = soundEnabled ? '🔊' : '🔇';
+        if (soundEnabled) unlockAudio();
+    });
+
+    function unlockAudio() {
+        if(!soundEnabled) return;
+        try {
+            if(!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if(audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            
+            // Cria um buffer silencioso rápido para forçar o desbloqueio no iOS Safari / WebKit Mobile
+            const buffer = audioCtx.createBuffer(1, 1, 22050);
+            const source = audioCtx.createBufferSource();
+            source.buffer = buffer;
+            source.connect(audioCtx.destination);
+            source.start(0);
+            
+            audioUnlocked = true;
+        } catch (e) {
+            console.warn("Desbloqueio de áudio falhou:", e);
+        }
+    }
+
+    document.body.addEventListener('touchstart', unlockAudio, { once: false, passive: true });
+    document.body.addEventListener('click', unlockAudio, { once: false });
+    document.getElementById('start-btn').addEventListener('click', () => { unlockAudio(); startGame(); });
+    document.getElementById('load-btn').addEventListener('click', () => { unlockAudio(); loadGame(); });
+
+    function playTone(freq, type, duration, vol = 0.06) {
+        if(!soundEnabled || isPaused) return;
+        
+        // Inicializa ou acorda o contexto de áudio em tempo de execução caso o celular o tenha suspendido
+        if(!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if(audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+
+        try {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type; osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
+        } catch(e) {
+            console.warn("Erro ao emitir som:", e);
+        }
+    }
+
+    function playBGM() {
+        if (!isPlaying || isPaused || !soundEnabled) return;
+        let note = bgmNotes[bgmIndex];
+        let duration = bgmTempos[bgmIndex];
+        playTone(note, 'triangle', duration / 1000 * 0.9, 0.05);
+        bgmIndex = (bgmIndex + 1) % bgmNotes.length;
+        bgmTimeout = setTimeout(playBGM, duration);
+    }
+    function stopBGM() { clearTimeout(bgmTimeout); }
+
+    function soundMeow() { playTone(550, 'sine', 0.2, 0.1); setTimeout(() => playTone(750, 'sine', 0.25, 0.08), 80); }
+    function soundJump() { playTone(350, 'triangle', 0.15, 0.1); }
+    function soundDuck() { playTone(150, 'square', 0.12, 0.08); }
+    function soundDamage() { playTone(120, 'sawtooth', 0.35, 0.15); soundMeow(); }
+    function soundItem() { playTone(800, 'sine', 0.1, 0.1); setTimeout(() => playTone(1200, 'sine', 0.15, 0.1), 100); }
+    function soundPurr() { 
+        for(let i=0; i<10; i++) setTimeout(() => playTone(100, 'triangle', 0.1, 0.1), i * 150);
+    }
+
+    // --- CONFIGURAÇÕES DO JOGO ---
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const wrapper = document.getElementById('canvas-wrapper');
+    
+    function resizeCanvas() {
+        canvas.width = wrapper.clientWidth;
+        canvas.height = wrapper.clientHeight;
+        roadTop = canvas.height * 0.45;
+        roadBottom = canvas.height - 20;
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    let frames = 0, isPlaying = false, isPaused = false;
+    let currentPhase = 0, phaseTimeLeft = 300;
+    let progress = 0, MAX_PROGRESS = 50; 
+    let bossMode = false, bossAttacksDodged = 0, currentTurn = "Dia", lastTime = 0;
+    
+    // Matriz de 20 cores super vivas e distintas para as roupas de cada Chefão
+    const bossColors = [
+        '#ff0055', '#3498db', '#2ecc71', '#f1c40f', '#e67e22',
+        '#9b59b6', '#1abc9c', '#e84393', '#00cec9', '#6c5ce7',
+        '#ff7675', '#fdcb6e', '#00b894', '#0984e3', '#d63031',
+        '#fd79a8', '#686de0', '#4cd137', '#00a8ff', '#f5cd79'
     ];
 
-    // --- 2. INICIALIZAÇÃO ---
-    window.onload = () => {
-        carregarEstados();
-        popularDaninhas();
-        document.getElementById('dataApp').valueAsDate = new Date();
+    // Gerador de 20 fases com recompensas exclusivas
+    const phases = [
+        { name: "Av. Frei Serafim", reward: "Coleirinha", style: "city" },
+        { name: "Ponte Estaiada", reward: "Roupinha Básica", style: "bridge" },
+        { name: "Encontro dos Rios", reward: "Medalha de Peixe", style: "nature" },
+        { name: "Pólo Cerâmico", reward: "Óculos Escuros", style: "pots" },
+        { name: "Mercado Central", reward: "Chapéu de Palha", style: "market" },
+        { name: "Shopping da Cidade", reward: "Botinhas Protetoras", style: "city" },
+        { name: "UFPI", reward: "Mochila Mini", style: "nature" },
+        { name: "Parque da Cidadania", reward: "Gravata Borboleta", style: "city" },
+        { name: "Complexo Cultural", reward: "Lenço Estiloso", style: "bridge" },
+        { name: "Zoobotânico", reward: "Petisco Premium", style: "nature" },
+        { name: "Bairro Poty Velho", reward: "Vaso Decorado", style: "pots" },
+        { name: "Praça Pedro II", reward: "Coroa de Flores", style: "city" },
+        { name: "Teatro 4 de Setembro", reward: "Máscara de Gala", style: "market" },
+        { name: "Nova Potycabana", reward: "Óculos Neon", style: "nature" },
+        { name: "Rua Climatizada", reward: "Cachecol de Lã", style: "city" },
+        { name: "Ponte Metálica", reward: "Pingente Brilhante", style: "bridge" },
+        { name: "Mirante da Ponte", reward: "Binóculo Mini", style: "bridge" },
+        { name: "Floresta Fóssil", reward: "Amuleto de Pedra", style: "nature" },
+        { name: "Mercado do Dirceu", reward: "Boné de Lado", style: "market" },
+        { name: "Rua Castro Alves", reward: "Lar Definitivo 🏠", style: "city" }
+    ].map((p, idx) => ({ ...p, bossColor: bossColors[idx] }));
+
+    const obstTypesArray = [
+        {type: 'hole', place: 'ground', w: 45, h: 10, color: '#111'}, 
+        {type: 'dog', place: 'ground', w: 50, h: 30, color: '#8b4513'}, 
+        {type: 'wood', place: 'sky', w: 45, h: 18, color: '#e67e22'}, // Objeto do Boss
+        {type: 'stone', place: 'sky', w: 30, h: 30, color: '#00d2d3'}, // Objeto do Boss
+        {type: 'bike', place: 'ground', w: 55, h: 40, color: '#2980b9'}, 
+        {type: 'moto', place: 'ground', w: 60, h: 45, color: '#e74c3c'}, 
+        {type: 'car', place: 'ground', w: 80, h: 40, color: '#2c3e50'}, 
+        {type: 'bus', place: 'ground', w: 120, h: 60, color: '#f1c40f'} 
+    ];
+
+    let cat = {
+        name: "Caju", color: "#e67e22", eye: "#2ecc71",
+        x: 100, y: 0, z: 0, w: 45, h: 30,
+        vx: 0, dz: 0, speed: 5, gravity: 0.8, jumpForce: -13,
+        isJumping: false, isDucking: false, lives: 7, invulnerable: 0, rewards: [],
+        nextXpMilestone: 10 // Alvo dinâmico para dar a vida extra a cada 10 XP
     };
 
-    function nextStep(atual, proximo) {
-        document.getElementById(`step${atual}`).classList.remove('active');
-        document.getElementById(`step${proximo}`).classList.add('active');
+    let boss = { x: 0, y: 0, active: false, color: '#c0392b', timer: 0, throwAnim: 0 };
+    let roadTop = 0, roadBottom = 0, scrollPos = 0;
+    let elements = [], obstacles = [], items = [];
+
+    let keys = {};
+    window.addEventListener('keydown', (e) => { keys[e.code] = true; });
+    window.addEventListener('keyup', (e) => { keys[e.code] = false; });
+
+    function setupMobileEvents(id, keycode) {
+        const btn = document.getElementById(id);
+        btn.addEventListener('touchstart', (e) => { e.preventDefault(); keys[keycode] = true; unlockAudio(); }, {passive: false});
+        btn.addEventListener('touchend', (e) => { e.preventDefault(); keys[keycode] = false; }, {passive: false});
     }
+    setupMobileEvents('pad-left', 'ArrowLeft');
+    setupMobileEvents('pad-right', 'ArrowRight');
+    setupMobileEvents('pad-jump', 'Space');
+    setupMobileEvents('pad-duck', 'KeyC');
 
-    // --- 3. API IBGE ---
-    async function carregarEstados() {
-        try {
-            const res = await fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome');
-            const estados = await res.json();
-            const select = document.getElementById('estado');
-            estados.forEach(uf => select.innerHTML += `<option value="${uf.sigla}">${uf.nome}</option>`);
-        } catch (e) {}
-    }
-    async function carregarMunicipios() {
-        const uf = document.getElementById('estado').value;
-        const select = document.getElementById('municipio');
-        if (!uf) return select.disabled = true;
-        select.disabled = false; select.innerHTML = '<option value="">Carregando...</option>';
-        try {
-            const res = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`);
-            const mun = await res.json();
-            select.innerHTML = '<option value="">Selecione...</option>';
-            mun.forEach(m => select.innerHTML += `<option value="${m.nome}">${m.nome}</option>`);
-        } catch (e) {}
-    }
+    // --- LÓGICA E FÍSICA ---
+    function handleInput() {
+        if (!isPlaying || isPaused) return;
 
-    function checkOutroCultura() {
-        const val = document.getElementById('culturaSelect').value;
-        document.getElementById('divOutroCultura').classList.toggle('hidden', val !== 'outro');
-    }
+        if (keys['ArrowRight'] || keys['KeyD']) cat.vx = cat.speed;
+        else if (keys['ArrowLeft'] || keys['KeyA']) cat.vx = -cat.speed;
+        else cat.vx = 0;
 
-    // --- 4. INTELIGÊNCIA DE VOO (T25p) ---
-    let statusVooGlobal = "";
-    let paramsVooGlobal = "";
+        cat.x += cat.vx;
+        if(cat.x < 10) cat.x = 10;
+        if(cat.x > canvas.width - cat.w - (bossMode ? 120 : 10)) cat.x = canvas.width - cat.w - (bossMode ? 120 : 10);
 
-    function calcularVoo() {
-        const t = parseFloat(document.getElementById('temp').value);
-        const u = parseFloat(document.getElementById('umid').value);
-        const v = parseFloat(document.getElementById('vento').value);
-        const panel = document.getElementById('flightPanel');
-        const badge = document.getElementById('flightStatus');
-        const msg = document.getElementById('flightMsg');
-        const param = document.getElementById('flightParams');
+        cat.y = roadBottom - cat.h;
 
-        if (isNaN(t) || isNaN(u) || isNaN(v)) { panel.style.display = 'none'; return; }
-        panel.style.display = 'block';
-
-        let status, cor, texto;
-        // Lógica de restrição para herbicidas hormonais (deriva/evaporação)
-        if (t > 32 || u < 50 || v > 12 || v < 2) {
-            status = "🛑 NÃO VOAR"; cor = "var(--danger)";
-            texto = v < 2 ? "Risco de inversão térmica (gotas ficam suspensas)." : "Risco extremo de deriva e rápida evaporação da calda.";
-            paramsVooGlobal = "N/A - Voo abortado.";
-        } else if (t >= 30 || u <= 55 || v >= 10 || v <= 3) {
-            status = "⚠️ ESPERAR MELHORAR"; cor = "var(--warning)";
-            texto = "Condições marginais. Aumente o tamanho da gota (350µm) e baixe a altura de voo.";
-            paramsVooGlobal = "Altura: 2.0m a 2.5m | Velocidade: 18 a 20 km/h | Faixa: 6.0m";
-        } else {
-            status = "✅ VOAR"; cor = "var(--primary)";
-            texto = "Condições edafoclimáticas ideais para aplicação segura.";
-            paramsVooGlobal = "Altura: 2.8m a 3.0m | Velocidade: 22 a 25 km/h | Faixa: 6.5 a 7.0m";
+        if ((keys['Space'] || keys['ArrowUp']) && !cat.isJumping && !cat.isDucking) {
+            cat.dz = cat.jumpForce; cat.isJumping = true; soundJump();
         }
 
-        badge.style.backgroundColor = cor;
-        badge.innerText = status;
-        msg.innerText = texto;
-        param.innerHTML = `<li>${paramsVooGlobal}</li>`;
-        
-        statusVooGlobal = `${status} - ${texto}`;
+        if ((keys['KeyC'] || keys['ArrowDown']) && !cat.isJumping) {
+            if(!cat.isDucking) soundDuck();
+            cat.isDucking = true;
+        } else {
+            cat.isDucking = false;
+        }
     }
 
-    function validarPasso3() {
-        if (!statusVooGlobal) return alert("Preencha as condições climáticas para continuar.");
-        nextStep(3, 4);
+    function checkXpMilestones() {
+        if (progress >= cat.nextXpMilestone) {
+            if(cat.lives < 7) cat.lives++; // Limitado estritamente a 7 vidas máximas
+            cat.nextXpMilestone += 10;
+            soundItem();
+            updateUI();
+        }
     }
 
-    // --- 5. DANINHAS E IMAGENS DA WIKIPEDIA ---
-    function popularDaninhas() {
-        const select = document.getElementById('daninhaSelect');
-        bdDaninhas.forEach(d => select.innerHTML += `<option value="${d.id}">${d.n} (${d.c})</option>`);
-        select.innerHTML += `<option value="outro">Outro (Preencher Manualmente)</option>`;
-    }
+    function spawnEntities() {
+        if(frames % 60 === 0) elements.push({ type: 'cloud', x: canvas.width, y: Math.random() * roadTop / 2, speed: 1 });
 
-    async function selecionarDaninha() {
-        const id = document.getElementById('daninhaSelect').value;
-        const imgCont = document.getElementById('imgContainer');
-        const img = document.getElementById('weedImg');
-        const cap = document.getElementById('weedCaption');
-        
-        document.getElementById('divOutroDaninha').classList.toggle('hidden', id !== 'outro');
-        
-        if (!id || id === 'outro') { imgCont.style.display = 'none'; return; }
+        if(frames % 150 === 0 && !bossMode && Math.random() > 0.4) {
+            items.push({ x: canvas.width, z: Math.random() > 0.5 ? 40 : 0, w: 15, h: 15, color: '#f1c40f', type: 'xp' });
+        }
 
-        const planta = bdDaninhas.find(d => d.id == id);
-        imgCont.style.display = 'block';
-        img.src = ""; cap.innerText = "Buscando imagem no repositório livre...";
+        let spawnRate = Math.max(30, 80 - (currentPhase * 3)); 
+        if(frames % spawnRate === 0 && !bossMode) {
+            let maxIndex = Math.min(currentPhase, obstTypesArray.length - 1);
+            // Evita que o lixo voador do boss spawne na corrida normal de forma genérica
+            let randIndex = Math.floor(Math.random() * (maxIndex + 1));
+            if(randIndex === 2 || randIndex === 3) randIndex = 0; // Remapeia madeira/pedra para buraco na corrida livre
+            
+            let chosen = obstTypesArray[randIndex];
+            let obs = { ...chosen, x: canvas.width, passed: false };
+            
+            if(obs.place === 'ground') { obs.y = roadBottom - obs.h; obs.z = 0; } 
+            else { obs.y = roadTop + 20; obs.z = 80 + Math.random()*50; }
+            
+            obs.vx = -(5 + (currentPhase * 0.3) + Math.random() * 2);
+            obs.vy = obs.place === 'sky' ? (2 + Math.random()) : 0;
+            obstacles.push(obs);
+        }
 
-        // API Wikipedia
-        try {
-            const query = planta.c.replace(' ', '_');
-            const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${query}`);
-            const data = await res.json();
-            if (data.thumbnail && data.thumbnail.source) {
-                img.src = data.thumbnail.source;
-                cap.innerText = `Imagem ilustrativa via Wikimedia: ${planta.c}`;
-            } else {
-                imgCont.style.display = 'none';
+        // Ataques Customizados do Chefão Humano
+        if(bossMode && frames % 45 === 0) {
+            boss.timer++;
+            boss.throwAnim = 15; // Ativa animação do braço por 15 frames
+            
+            let isStone = Math.random() > 0.5;
+            let objType = isStone ? obstTypesArray[3] : obstTypesArray[2]; // 3=pedra neon, 2=madeira viva
+            let obs = { ...objType, x: boss.x - 15, passed: false };
+            
+            // Alterna lançamentos altos e rasteiros
+            if(Math.random() > 0.5) { 
+                obs.y = roadBottom - obs.h; obs.z = 0; 
+            } else { 
+                obs.y = roadTop + 45; obs.z = 40; 
             }
-        } catch (e) { imgCont.style.display = 'none'; }
+            obs.vx = -(7 + (currentPhase * 0.6)); obs.vy = 0;
+            obstacles.push(obs);
+        }
     }
 
-    // --- 6. GERAR RELATÓRIO FINAL ---
-    function gerarRelatorio() {
-        // Coleta (1 e 2)
-        document.getElementById('r_prof').innerText = document.getElementById('profissional').value || "Não informado";
-        document.getElementById('r_faz').innerText = document.getElementById('fazenda').value || "Não informado";
-        document.getElementById('r_prop').innerText = document.getElementById('proprietario').value || "Não informado";
-        document.getElementById('r_data').innerText = document.getElementById('dataApp').value.split('-').reverse().join('/') || "Não informado";
-        document.getElementById('r_local').innerText = `${document.getElementById('municipio').value || '-'} / ${document.getElementById('estado').value || '-'}`;
+    function updateLogic() {
+        frames++;
+
+        if (cat.isJumping) {
+            cat.z -= cat.dz; cat.dz += cat.gravity;
+            if (cat.z <= 0) { cat.z = 0; cat.dz = 0; cat.isJumping = false; }
+        }
+        if(cat.invulnerable > 0) cat.invulnerable--;
+
+        let scrollSpeed = 2 + (cat.vx > 0 ? 3 : (cat.vx < 0 ? -1 : 0));
+        scrollPos += scrollSpeed;
+        elements.forEach(e => { e.x -= (e.speed + scrollSpeed*0.2); });
         
-        const cultSel = document.getElementById('culturaSelect').value;
-        document.getElementById('r_cult').innerText = cultSel === 'outro' ? document.getElementById('culturaOutro').value : cultSel;
+        items.forEach((item, index) => {
+            item.x -= (4 + scrollSpeed*0.5);
+            if (Math.abs(cat.x - item.x) < cat.w && Math.abs(cat.z - item.z) < 30) {
+                progress += 2; items.splice(index, 1); 
+                checkXpMilestones(); updateUI();
+            }
+        });
 
-        // Coleta (3 - Clima)
-        document.getElementById('r_clima').innerText = `Temp: ${document.getElementById('temp').value}°C | Umid: ${document.getElementById('umid').value}% | Vento: ${document.getElementById('vento').value} km/h`;
-        document.getElementById('r_decisao').innerText = statusVooGlobal;
-        document.getElementById('r_params').innerText = paramsVooGlobal;
+        obstacles.forEach(o => { 
+            o.x += o.vx - (scrollSpeed*0.3);
+            if(o.place === 'sky') o.z -= o.vy;
 
-        // Coleta (4 - Alvo)
-        const dId = document.getElementById('daninhaSelect').value;
-        if (dId === 'outro') {
-            document.getElementById('r_alvo').innerText = document.getElementById('daninhaOutro').value || "Manual";
-            document.getElementById('r_herb').innerText = "-";
-            document.getElementById('r_acao').innerText = "-";
-            document.getElementById('r_sint').innerText = "-";
-            document.getElementById('r_resid').innerText = "-";
-            document.getElementById('r_dose').innerText = "Conforme prescrição";
-            document.getElementById('r_vol').innerText = "Conforme T25p";
-        } else {
-            const planta = bdDaninhas.find(d => d.id == dId);
-            document.getElementById('r_alvo').innerText = `${planta.n} (${planta.c})`;
-            document.getElementById('r_herb').innerText = planta.h;
-            document.getElementById('r_acao').innerText = planta.a;
-            document.getElementById('r_sint').innerText = planta.s;
-            document.getElementById('r_resid').innerText = planta.r;
-            document.getElementById('r_dose').innerText = planta.d;
-            document.getElementById('r_vol').innerText = planta.v;
+            let hitX = cat.x < o.x + o.w && cat.x + cat.w > o.x;
+            let hit = false;
+            if(hitX) {
+                let catH = cat.isDucking ? cat.h/1.8 : cat.h;
+                if (o.type === 'hole' && cat.z < 10) hit = true;
+                else if (o.type !== 'hole' && cat.z < o.z + o.h && cat.z + catH > o.z) hit = true;
+            }
+
+            if(hit && cat.invulnerable <= 0) takeDamage();
+
+            if(!o.passed && o.x + o.w < cat.x) {
+                o.passed = true;
+                if(bossMode) {
+                    bossAttacksDodged++;
+                    if(bossAttacksDodged >= 10 + currentPhase * 1.5) winPhase();
+                }
+                // REMOVIDO: Obstáculos comuns não concedem mais XP ao passar reto
+            }
+        });
+
+        elements = elements.filter(e => e.x > -50);
+        items = items.filter(i => i.x > -50);
+        obstacles = obstacles.filter(o => o.x > -100 && o.z > -50);
+
+        if(!bossMode && (progress >= MAX_PROGRESS || phaseTimeLeft <= 0)) triggerBoss();
+        
+        if(bossMode) {
+            boss.y = roadBottom - 95 + Math.sin(frames*0.12)*15; // Flutuação rítmica de movimento humana
+            if(boss.throwAnim > 0) boss.throwAnim--;
+        }
+    }
+
+    function takeDamage() {
+        cat.lives--; cat.invulnerable = 90; soundDamage(); updateUI();
+        if(cat.lives <= 0) {
+            isPlaying = false; stopBGM();
+            document.getElementById('hud').classList.add('hidden');
+            document.getElementById('mobile-controls').style.display = 'none';
+            document.getElementById('top-bar').style.display = 'none';
+            document.getElementById('game-over').classList.remove('hidden');
+        }
+    }
+
+    function triggerBoss() {
+        bossMode = true; bossAttacksDodged = 0; boss.active = true; boss.x = canvas.width - 90; boss.throwAnim = 0;
+        document.getElementById('boss-ui').style.display = 'block';
+        document.getElementById('counter-ui').innerText = "Desvie dos ataques!";
+    }
+
+    // --- RENDERIZAÇÃO ---
+    function drawScenery() {
+        let style = phases[currentPhase].style;
+        let skyGradient = ctx.createLinearGradient(0, 0, 0, roadTop);
+        
+        if (currentTurn === "Dia") { skyGradient.addColorStop(0, "#3498db"); skyGradient.addColorStop(1, "#87ceeb"); }
+        else if (currentTurn === "Tarde") { skyGradient.addColorStop(0, "#d35400"); skyGradient.addColorStop(1, "#f39c12"); }
+        else { skyGradient.addColorStop(0, "#111"); skyGradient.addColorStop(1, "#2c3e50"); }
+        
+        ctx.fillStyle = skyGradient; ctx.fillRect(0, 0, canvas.width, roadTop);
+
+        elements.forEach(e => {
+            if(e.type === 'cloud') {
+                ctx.fillStyle = currentTurn==="Noite"?"rgba(255,255,255,0.1)":"rgba(255,255,255,0.6)";
+                ctx.beginPath(); ctx.arc(e.x, e.y, 15, 0, Math.PI*2); ctx.arc(e.x+20, e.y-10, 20, 0, Math.PI*2); ctx.arc(e.x+40, e.y, 15, 0, Math.PI*2); ctx.fill();
+            }
+        });
+
+        ctx.fillStyle = currentTurn==="Noite"?"rgba(0,0,0,0.6)":"rgba(0,0,0,0.2)";
+        let bgScroll = scrollPos * 0.5;
+
+        if(style === 'bridge') { 
+            let bx = canvas.width/2 - (bgScroll % (canvas.width+200)) + 100;
+            ctx.fillRect(bx, roadTop-130, 20, 130); 
+            ctx.strokeStyle = "rgba(255,255,255,0.5)"; ctx.lineWidth = 2;
+            for(let i=0; i<8; i++) {
+                ctx.beginPath(); ctx.moveTo(bx+10, roadTop-110); ctx.lineTo(bx - 100 + (i*15), roadTop); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(bx+10, roadTop-110); ctx.lineTo(bx + 30 + (i*15), roadTop); ctx.stroke();
+            }
+        } else if (style === 'nature') { 
+            let rx = - (bgScroll % canvas.width);
+            ctx.fillStyle = "#8b4513"; ctx.fillRect(0, roadTop-20, canvas.width, 20); 
+            ctx.fillStyle = "#2980b9"; ctx.fillRect(rx+canvas.width/2, roadTop-20, canvas.width, 20); 
+        } else if (style === 'pots') { 
+            let px = canvas.width - (bgScroll % (canvas.width+100));
+            ctx.fillStyle = "#d35400"; ctx.beginPath(); ctx.arc(px, roadTop-20, 20, 0, Math.PI*2); ctx.fill();
+            ctx.fillRect(px-10, roadTop-50, 20, 30);
+        } else { 
+            let cx = canvas.width/2 - (bgScroll % 400);
+            ctx.fillRect(cx, roadTop-80, 50, 80); ctx.fillRect(cx+80, roadTop-100, 60, 100);
         }
 
-        // Mostra o passo 5
-        document.getElementById('relatorio-final').style.display = 'block';
-        nextStep(4, 5);
-    }
-</script>
+        ctx.fillStyle = currentTurn==="Dia"?"#7f8c8d":currentTurn==="Tarde"?"#5d6d7e":"#2c3e50";
+        ctx.fillRect(0, roadTop, canvas.width, canvas.height - roadTop);
 
+        ctx.fillStyle = "#f1c40f"; 
+        for(let i=0; i<15; i++) {
+            let lineX = ((i * 100) - (scrollPos * 1.5) % 100);
+            ctx.fillRect(lineX, roadTop + (roadBottom-roadTop)/2, 40, 4);
+        }
+    }
+
+    function drawCat() {
+        if(cat.invulnerable > 0 && frames % 8 < 4) return;
+
+        let dynamicW = cat.w;
+        let dynamicH = cat.h;
+        let drawY = cat.y - cat.z; 
+        let h = cat.isDucking ? dynamicH / 1.8 : dynamicH; 
+        let yOffset = cat.isDucking ? dynamicH - h : 0;
+
+        ctx.save();
+        ctx.translate(cat.x, drawY + yOffset);
+
+        ctx.fillStyle = "rgba(0,0,0,0.3)";
+        ctx.beginPath(); ctx.ellipse(dynamicW/2, dynamicH + cat.z - yOffset, 18, 4, 0, 0, Math.PI*2); ctx.fill();
+
+        let tailSwing = Math.sin(frames * 0.2) * 8;
+        ctx.strokeStyle = cat.color; ctx.lineWidth = 5;
+        ctx.beginPath(); ctx.moveTo(2, h/2); ctx.quadraticCurveTo(-15, -8 + tailSwing, -10, -18 + tailSwing); ctx.stroke();
+
+        let walkCycle = (cat.vx !== 0) ? Math.sin(frames * 0.4) * 5 : 0;
+        if(cat.isJumping) walkCycle = 0;
+        ctx.fillStyle = cat.color;
+        ctx.fillRect(8 + walkCycle, h-4, 6, 8); ctx.fillRect(dynamicW - 14 - walkCycle, h-4, 6, 8); 
+
+        ctx.fillRect(0, 0, dynamicW, h);
+
+        let headY = cat.isDucking ? 4 : -12;
+        ctx.beginPath(); ctx.arc(dynamicW - 10, headY + 14, 16, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(dynamicW - 24, headY + 4); ctx.lineTo(dynamicW - 14, headY - 8); ctx.lineTo(dynamicW - 4, headY + 4); ctx.fill();
+
+        let isHappy = (progress > 25 || cat.lives >= 7);
+        if(frames % 120 < 8) { 
+            ctx.strokeStyle = "black"; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(dynamicW - 12, headY+12); ctx.lineTo(dynamicW-2, headY+12); ctx.stroke();
+        } else {
+            ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(dynamicW - 6, headY + 12, 6, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = cat.eye; ctx.beginPath(); ctx.arc(dynamicW - 5, headY + 12, 3, 0, Math.PI*2); ctx.fill();
+            if(isHappy) { ctx.strokeStyle = "#111"; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(dynamicW - 4, headY + 18, 3, 0, Math.PI); ctx.stroke(); }
+        }
+
+        if(cat.rewards.includes("Coleirinha")) { ctx.fillStyle = "#e74c3c"; ctx.fillRect(dynamicW - 20, headY + 24, 12, 4); }
+        if(cat.rewards.includes("Chapéu de Palha")) { ctx.fillStyle = "#f1c40f"; ctx.fillRect(dynamicW - 24, headY - 6, 24, 5); ctx.fillRect(dynamicW - 18, headY - 14, 12, 8); }
+
+        ctx.restore();
+    }
+
+    function drawEntities() {
+        items.forEach(i => {
+            ctx.fillStyle = i.color;
+            ctx.beginPath(); ctx.arc(i.x + i.w/2, roadBottom - i.z - i.h/2, i.w/2, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = "white"; ctx.font="10px Arial"; ctx.fillText("XP", i.x, roadBottom - i.z - i.h);
+        });
+
+        obstacles.forEach(o => {
+            let drawY = (o.place === 'ground') ? o.y : (roadBottom - o.z - o.h);
+
+            ctx.fillStyle = "rgba(0,0,0,0.3)";
+            ctx.beginPath(); ctx.ellipse(o.x + o.w/2, roadBottom, o.w/2, 5, 0, 0, Math.PI*2); ctx.fill();
+
+            // Renderizações Especiais das Armas Vivificadas do Chefão
+            if (o.type === 'wood') {
+                ctx.save();
+                ctx.translate(o.x + o.w/2, drawY + o.h/2);
+                ctx.rotate(frames * 0.08);
+                
+                // Madeira viva: tronco cilíndrico marrom/laranja de alta saturação
+                ctx.fillStyle = "#ff793f"; 
+                ctx.fillRect(-o.w/2, -o.h/2, o.w, o.h);
+                
+                // Borda e veios internos nítidos
+                ctx.strokeStyle = "#cd6133"; ctx.lineWidth = 3;
+                ctx.strokeRect(-o.w/2, -o.h/2, o.w, o.h);
+                
+                ctx.beginPath(); ctx.strokeStyle = "#fff"; ctx.lineWidth = 1.5;
+                ctx.moveTo(-o.w/2 + 6, -3); ctx.lineTo(o.w/2 - 6, -3);
+                ctx.moveTo(-o.w/2 + 10, 3); ctx.lineTo(o.w/2 - 10, 3);
+                ctx.stroke();
+                ctx.restore();
+            } 
+            else if (o.type === 'stone') {
+                ctx.save();
+                ctx.translate(o.x + o.w/2, drawY + o.h/2);
+                ctx.rotate(frames * 0.04);
+                
+                // Pedra: Cristal Pontiagudo Ciano Neon Super Vivo
+                ctx.fillStyle = "#00d2d3"; 
+                ctx.strokeStyle = "#1dd1a1"; ctx.lineWidth = 3;
+                
+                ctx.beginPath();
+                ctx.moveTo(0, -o.h/2);
+                ctx.lineTo(o.w/2, -o.h/4);
+                ctx.lineTo(o.w/3, o.h/2);
+                ctx.lineTo(-o.w/3, o.h/2);
+                ctx.lineTo(-o.w/2, -o.h/4);
+                ctx.closePath();
+                ctx.fill(); ctx.stroke();
+                
+                // Linhas de facetação reflexivas em branco puro
+                ctx.beginPath(); ctx.strokeStyle = "white"; ctx.lineWidth = 1.5;
+                ctx.moveTo(0, -o.h/2); ctx.lineTo(0, o.h/2);
+                ctx.moveTo(-o.w/2, -o.h/4); ctx.lineTo(0, 0);
+                ctx.moveTo(o.w/2, -o.h/4); ctx.lineTo(0, 0);
+                ctx.stroke();
+                ctx.restore();
+            } 
+            else {
+                // Outros obstáculos comuns
+                ctx.fillStyle = o.color;
+                if(o.type === 'hole') {
+                    ctx.fillStyle = "#111"; ctx.beginPath(); ctx.ellipse(o.x + o.w/2, o.y + o.h/2, o.w/2, o.h/2, 0, 0, Math.PI*2); ctx.fill();
+                } else if (o.type === 'dog') {
+                    ctx.fillRect(o.x, drawY+10, o.w, o.h-10); ctx.fillRect(o.x-10, drawY, 20, 20); 
+                } else if (o.type === 'car' || o.type === 'bus') {
+                    ctx.fillRect(o.x, drawY, o.w, o.h); ctx.fillStyle = "#ecf0f1"; ctx.fillRect(o.x + 5, drawY + 5, o.w/3, o.h/2); 
+                } else if (o.type === 'bike' || o.type === 'moto') {
+                    ctx.beginPath(); ctx.arc(o.x+10, drawY+o.h, 10, 0, Math.PI*2); ctx.arc(o.x+o.w-10, drawY+o.h, 10, 0, Math.PI*2); ctx.fill(); 
+                    ctx.fillRect(o.x+10, drawY+10, o.w-20, o.h-10); 
+                }
+            }
+        });
+
+        // CHEFÃO: Pessoa com anatomia completa definida e animação por cor exclusiva de fase
+        if(bossMode && boss.active) {
+            let bColor = phases[currentPhase].bossColor || '#c0392b';
+            ctx.save();
+            ctx.translate(boss.x, boss.y);
+
+            // Sombra humana
+            ctx.fillStyle = "rgba(0,0,0,0.2)";
+            ctx.beginPath(); ctx.ellipse(25, 95, 22, 5, 0, 0, Math.PI*2); ctx.fill();
+
+            // Pernas e Calça
+            ctx.fillStyle = "#2c3e50"; 
+            ctx.fillRect(12, 60, 10, 28); // Esquerda
+            ctx.fillRect(28, 60, 10, 28); // Direita
+            ctx.fillStyle = "#111"; // Botas
+            ctx.fillRect(7, 84, 15, 5);
+            ctx.fillRect(28, 84, 15, 5);
+
+            // Tronco (Camisa com a Cor Única da Fase atual)
+            ctx.fillStyle = bColor;
+            ctx.fillRect(8, 20, 34, 42);
+
+            // Cabeça e Pescoço (Tom de pele definido)
+            ctx.fillStyle = "#ffdad1"; 
+            ctx.fillRect(20, 14, 10, 8); // Pescoço
+            ctx.beginPath(); ctx.arc(25, 3, 13, 0, Math.PI*2); ctx.fill(); // Rosto
+
+            // Detalhes faciais
+            ctx.fillStyle = "#111";
+            ctx.fillRect(18, -1, 3, 3); // Olho E
+            ctx.fillRect(27, -1, 3, 3); // Olho D
+            ctx.strokeStyle = "#c0392b"; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(23, 5, 4, 0, Math.PI); ctx.stroke(); // Expressão de Desafio
+
+            // Cabelo do vilão
+            ctx.fillStyle = "#2d3436";
+            ctx.fillRect(12, -12, 26, 5);
+            ctx.fillRect(12, -10, 5, 12);
+
+            // Braço Esquerdo (Fundo - estático)
+            ctx.fillStyle = bColor;
+            ctx.fillRect(0, 20, 8, 24);
+
+            // Braço Direito (Frente - Dinâmico com Movimento Real de Lançamento)
+            ctx.save();
+            ctx.translate(40, 24); // Articulação do Ombro
+            if(boss.throwAnim > 0) {
+                // Braço rotacionado para cima e para frente no ápice do arremesso!
+                ctx.rotate(-Math.PI / 1.3); 
+                ctx.fillStyle = bColor; ctx.fillRect(0, 0, 8, 25);
+                ctx.fillStyle = "#ffdad1"; ctx.fillRect(0, 22, 8, 6); // Mão
+            } else {
+                // Braço em repouso oscilando levemente
+                ctx.rotate(Math.sin(frames * 0.1) * 0.08); 
+                ctx.fillStyle = bColor; ctx.fillRect(0, 0, 8, 25);
+                ctx.fillStyle = "#ffdad1"; ctx.fillRect(0, 22, 8, 6);
+            }
+            ctx.restore();
+
+            ctx.restore();
+        }
+    }
+
+    function drawEndingScene() {
+        ctx.fillStyle = "#87ceeb"; ctx.fillRect(0,0, canvas.width, canvas.height); 
+        ctx.fillStyle = "#2ecc71"; ctx.fillRect(0, canvas.height/2, canvas.width, canvas.height/2); 
+
+        let tx = canvas.width / 2;
+        let ty = canvas.height / 2 + 20;
+        
+        ctx.fillStyle = "#8e44ad"; ctx.fillRect(tx - 20, ty, 40, 60);
+
+        ctx.fillStyle = "#f1c27d"; 
+        ctx.beginPath(); ctx.arc(tx, ty - 20, 18, 0, Math.PI*2); ctx.fill();
+
+        ctx.fillStyle = "#111"; 
+        ctx.beginPath(); ctx.arc(tx, ty - 25, 20, Math.PI, 0); ctx.fill();
+        ctx.fillRect(tx - 20, ty - 25, 10, 30);
+        ctx.fillRect(tx + 10, ty - 25, 10, 30);
+
+        ctx.strokeStyle = "black"; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(tx - 7, ty - 20, 6, 0, Math.PI*2); ctx.stroke();
+        ctx.beginPath(); ctx.arc(tx + 7, ty - 20, 6, 0, Math.PI*2); ctx.stroke();
+
+        ctx.fillStyle = cat.color;
+        ctx.fillRect(tx - 10, ty + 10, 20, 15);
+        ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(tx-3, ty+12, 3, 0, Math.PI*2); ctx.arc(tx+3, ty+12, 3, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = cat.eye; ctx.beginPath(); ctx.arc(tx-3, ty+12, 1.5, 0, Math.PI*2); ctx.arc(tx+3, ty+12, 1.5, 0, Math.PI*2); ctx.fill();
+
+        let catColors = ["#bdc3c7", "#34495e", "#d35400", "#7f8c8d"];
+        let positions = [[tx-50, ty+40], [tx+50, ty+40], [tx-30, ty+60], [tx+30, ty+60]];
+        
+        for(let i=0; i<4; i++) {
+            let cx = positions[i][0]; let cy = positions[i][1];
+            ctx.fillStyle = catColors[i]; ctx.fillRect(cx, cy, 15, 10);
+            ctx.beginPath(); ctx.arc(cx+12, cy, 6, 0, Math.PI*2); ctx.fill();
+        }
+    }
+
+    // --- CONTROLE DE FLUXO ---
+    function startGame() {
+        cat.name = document.getElementById('cat-name').value || "TereCat";
+        cat.color = document.getElementById('cat-fur').value;
+        cat.eye = document.getElementById('cat-eye').value;
+        
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('top-bar').style.display = 'flex';
+        document.getElementById('hud').classList.remove('hidden');
+        
+        resizeCanvas(); soundMeow(); startPhase();
+    }
+
+    function startPhase() {
+        if(currentPhase >= phases.length) { showVictory(); return; }
+
+        let phaseData = phases[currentPhase];
+        document.getElementById('phase-ui').innerText = `Fase ${currentPhase + 1}/20: ${phaseData.name}`;
+        
+        cat.x = 50; cat.y = roadBottom - cat.h; cat.z = 0; cat.vx = 0;
+        cat.nextXpMilestone = 10; // Reinicia alvo local de ganho de vidas extras por nível
+        obstacles = []; elements = []; items = [];
+        phaseTimeLeft = 300; progress = 0; scrollPos = 0; bossMode = false; boss.active = false;
+        currentTurn = "Dia";
+        document.getElementById('boss-ui').style.display = 'none';
+        
+        lastTime = performance.now();
+        isPlaying = true; isPaused = false; bgmIndex = 0;
+        
+        updateUI(); stopBGM(); playBGM();
+        requestAnimationFrame(gameLoop);
+    }
+
+    function updateUI() {
+        // Exibe estritamente o layout baseado no limite fixo de 7 vidas
+        let blackHearts = Math.max(0, 7 - cat.lives);
+        document.getElementById('lives-ui').innerText = "❤️".repeat(Math.max(0, cat.lives)) + "🖤".repeat(blackHearts);
+        
+        if(!bossMode) document.getElementById('counter-ui').innerText = `XP: ${progress}/${MAX_PROGRESS}`;
+    }
+
+    function togglePause() {
+        if(!isPlaying) return;
+        isPaused = !isPaused;
+        if(isPaused) {
+            document.getElementById('pause-screen').classList.remove('hidden');
+            stopBGM();
+        } else {
+            document.getElementById('pause-screen').classList.add('hidden');
+            lastTime = performance.now();
+            playBGM(); requestAnimationFrame(gameLoop);
+        }
+    }
+
+    function saveGame() {
+        let saveData = { cat, currentPhase, progress, phaseTimeLeft };
+        localStorage.setItem('terecat_save', JSON.stringify(saveData));
+        alert("Sua jornada de 20 fases foi salva!");
+    }
+
+    function loadGame() {
+        let data = localStorage.getItem('terecat_save');
+        if(data) {
+            let p = JSON.parse(data);
+            cat = p.cat; currentPhase = p.currentPhase; progress = p.progress; phaseTimeLeft = p.phaseTimeLeft;
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('top-bar').style.display = 'flex';
+            document.getElementById('hud').classList.remove('hidden');
+            resizeCanvas(); startPhase(); 
+        } else {
+            alert("Nenhum progresso encontrado.");
+        }
+    }
+
+    function goToHome() { location.reload(); }
+
+    function winPhase() {
+        isPlaying = false; stopBGM();
+        if(cat.lives < 7) cat.lives++; // +1 Vida Extra por passar de fase limitado estritamente ao teto de 7
+        cat.rewards.push(phases[currentPhase].reward);
+        soundPurr();
+        document.getElementById('hud').classList.add('hidden');
+        document.getElementById('top-bar').style.display = 'none';
+        document.getElementById('phase-title').innerText = `Fase ${currentPhase + 1} Concluída!`;
+        document.getElementById('phase-reward').innerText = `Recompensa: ${phases[currentPhase].reward}`;
+        document.getElementById('phase-screen').classList.remove('hidden');
+    }
+
+    function nextPhase() {
+        currentPhase++;
+        document.getElementById('phase-screen').classList.add('hidden');
+        document.getElementById('top-bar').style.display = 'flex';
+        document.getElementById('hud').classList.remove('hidden');
+        startPhase();
+    }
+
+    function showVictory() {
+        isPlaying = false; stopBGM();
+        document.getElementById('hud').classList.add('hidden');
+        document.getElementById('mobile-controls').style.display = 'none';
+        document.getElementById('top-bar').style.display = 'none';
+        document.getElementById('victory-screen').classList.remove('hidden');
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawEndingScene();
+        soundMeow(); soundPurr();
+    }
+
+    function gameLoop(timestamp) {
+        if (!isPlaying || isPaused) return;
+
+        if (timestamp - lastTime >= 1000) {
+            phaseTimeLeft--; lastTime = timestamp;
+            
+            let m = Math.floor(phaseTimeLeft / 60).toString().padStart(2, '0');
+            let s = (phaseTimeLeft % 60).toString().padStart(2, '0');
+            document.getElementById('timer-ui').innerText = `${m}:${s}`;
+
+            let elapsed = 300 - phaseTimeLeft;
+            if(elapsed < 100) { currentTurn = "Dia"; document.getElementById('turn-ui').innerText = "☀️ Dia"; }
+            else if (elapsed < 200) { currentTurn = "Tarde"; document.getElementById('turn-ui').innerText = "⛅ Tarde"; }
+            else { currentTurn = "Noite"; document.getElementById('turn-ui').innerText = "🌙 Noite"; }
+        }
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        handleInput(); updateLogic(); spawnEntities();
+        drawScenery(); drawEntities(); drawCat();
+
+        requestAnimationFrame(gameLoop);
+    }
+    
+    window.onload = () => { 
+        resizeCanvas();
+        if(localStorage.getItem('terecat_save')) document.getElementById('load-btn').style.display = 'block'; 
+        else document.getElementById('load-btn').style.display = 'none'; 
+    };
+</script>
 </body>
 </html>
-
-
-
