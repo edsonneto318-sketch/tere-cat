@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroSolo - Sistema Especialista de Interpretação</title>
+    <style>
+        /* CONFIGURAÇÕES GERAIS E CORES */
+        :root {
+            --brown-dark: #3E2723;
+            --brown-medium: #5D4037;
+            --brown-light: #8D6E63;
+            --brown-bg: #EFEBE9;
+            --accent: #FFB300;
+            --success: #2E7D32;
+            --danger: #C62828;
+            --info: #1565C0;
+        }
+
+        * { box-sizing: border-box; font-family: 'Times New Roman', Times, serif; font-size: 12pt; margin: 0; padding: 0; }
+        body { background-color: var(--brown-bg); color: var(--brown-dark); display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
+        
+        h1, h2, h3, h4 { text-align: center; color: var(--brown-dark); margin-bottom: 15px; }
+        h1 { font-size: 20pt; border-bottom: 2px solid var(--brown-medium); padding-bottom: 10px; }
+        h2 { font-size: 16pt; }
+        h3 { font-size: 14pt; margin-top: 20px; text-align: left; border-left: 4px solid var(--accent); padding-left: 10px; }
+
+        .app-container {
+            background: #ffffff; width: 100%; max-width: 950px; border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(62, 39, 35, 0.15); padding: 30px; position: relative;
+        }
+
+        /* OVERLAY DE LOGIN */
+        #login-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(62, 39, 35, 0.95); z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .login-box {
+            background: white; padding: 40px; border-radius: 12px; text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 90%; max-width: 400px;
+        }
+        .login-box h2 { color: var(--brown-dark); margin-bottom: 10px; }
+        .login-box p { color: var(--brown-medium); margin-bottom: 20px; font-size: 11pt; }
+        .login-box input { margin-bottom: 15px; text-align: center; font-size: 14pt; letter-spacing: 2px; }
+
+        /* PROGRESSO E ETAPAS */
+        .progress-container { width: 100%; background-color: #D7CCC8; border-radius: 8px; margin-bottom: 25px; height: 12px; overflow: hidden; }
+        .progress-bar { height: 100%; background-color: var(--brown-medium); width: 20%; transition: width 0.4s ease; }
+        .step { display: none; animation: fadeIn 0.4s; }
+        .step.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* FORMULÁRIOS */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--brown-medium); }
+        input, select {
+            width: 100%; padding: 10px; border: 1px solid #BCAAA4; border-radius: 6px;
+            background-color: #FAFAFA; color: #333; transition: border 0.3s;
+        }
+        input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 5px rgba(255, 179, 0, 0.3); }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+        
+        .box-destaque { background: #FFF8E1; border: 1px dashed var(--accent); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+
+        /* BOTÕES */
+        .btn-container { display: flex; justify-content: space-between; margin-top: 25px; border-top: 1px solid #E0E0E0; padding-top: 15px; }
+        button {
+            background-color: var(--brown-medium); color: white; border: none; padding: 12px 24px;
+            border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.3s;
+        }
+        button:hover { background-color: var(--brown-dark); transform: translateY(-2px); }
+        .btn-prev { background-color: var(--brown-light); }
+        .btn-success { background-color: var(--success); width: 100%; max-width: 300px; }
+        .btn-success:hover { background-color: #1B5E20; }
+        .btn-container .btn-success { width: auto; max-width: none; }
+        
+        /* LAUDOS */
+        #container-laudos { display: flex; flex-direction: column; gap: 20px; }
+        .laudo-card { border: 2px solid var(--brown-medium); border-radius: 8px; padding: 20px; background: #FAFAFA; }
+        .bloco-laudo { margin-bottom: 15px; padding: 15px; background: white; border-left: 4px solid var(--brown-medium); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        
+        .status-alto { color: var(--success); font-weight: bold; }
+        .status-medio { color: var(--accent); font-weight: bold; }
+        .status-baixo { color: var(--danger); font-weight: bold; }
+
+        .dev-info { font-size: 8pt; text-align: center; margin-top: 30px; color: var(--brown-light); border-top: 1px solid #eee; padding-top: 10px; }
+
+        .interpretacao-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11pt; }
+
+        @media print {
+            body { background: white; }
+            .app-container { box-shadow: none; padding: 0; }
+            button, .progress-container, .no-print { display: none; }
+            .laudo-card { page-break-inside: avoid; border: 1px solid #000; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="login-overlay">
+        <div class="login-box">
+            <h2>🌾 AgroSolo</h2>
+            <p>Acesso Restrito ao Sistema Especialista</p>
+            <input type="email" id="email-acesso" placeholder="Digite seu e-mail..." style="margin-bottom: 15px; text-align: center; font-size: 14pt; width: 100%; border: 1px solid #BCAAA4; border-radius: 6px; padding: 10px;">
+            <input type="password" id="senha-acesso" placeholder="Digite sua senha...">
+            <button type="button" class="btn-success" id="btn-login">Entrar</button>
+            <p id="msg-erro" style="color: var(--danger); display: none; margin-top: 10px; font-weight: bold;"></p>
+        </div>
+    </div>
+    <div class="app-container">
+        <h1>🌾 AgroSolo 🌾</h1>
+        <p style="text-align: center; margin-bottom: 20px; color: var(--brown-medium);">Sistema Especialista de Interpretação e Recomendação</p>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <form id="agroForm">
+            
+            <div class="step active" id="step1">
+                <h2>📋 Etapa 1: Dados Gerais e Localização</h2>
+                <div class="grid-2">
+                    <div class="form-group"><label>🧑‍🌾 Responsável pela interpretação e recomendação:</label><input type="text" id="id_profissional" placeholder="Nome do Responsável"></div>
+                    <div class="form-group"><label>📅 Data da Análise:</label><input type="date" id="id_data"></div>
+                    <div class="form-group"><label>🚜 Propriedade / Fazenda:</label><input type="text" id="id_fazenda" placeholder="Nome da Propriedade"></div>
+                    <div class="form-group"><label>👤 Proprietário:</label><input type="text" id="id_proprietario" placeholder="Nome do Proprietário"></div>
+                </div>
+                
+                <div class="box-destaque">
+                    <label>📍 Localização (Integração IBGE)</label>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <select id="id_estado" onchange="carregarMunicipios()">
+                                <option value="">Selecione o Estado...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <select id="id_municipio">
+                                <option value="">Aguardando Estado...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <div></div>
+                    <button type="button" onclick="nextStep(2)">Avançar ➡️</button>
+                </div>
+            </div>
+
+            <div class="step" id="step2">
+                <h2>📚 Etapa 2: Base de Recomendação e Cultura</h2>
+                
+                <div class="box-destaque">
+                    <label>📖 Base Técnica / Manual de Recomendação:</label>
+                    <select id="config_manual">
+                        <option value="5aprox">5ª Aproximação de Minas Gerais (CFSEMG)</option>
+                        <option value="cerrado">Correção e Adubação do Cerrado (Embrapa)</option>
+                    </select>
+                    <small style="color:var(--info);">* A escolha do manual altera os níveis críticos, a exigência de calagem e as curvas de dosagem de adubos.</small>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group"><label>🗺️ Identificação do Talhão/Gleba:</label><input type="text" id="id_talhao" placeholder="Ex: Talhão 01 - Sede"></div>
+                    <div class="form-group"><label>📐 Área (ha):</label><input type="number" id="id_area" placeholder="Ex: 50"></div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>🌱 Cultura Alvo:</label>
+                        <select id="cult_cultura" onchange="atualizarUnidadeProdutividade()">
+                            <option value="">Selecione a Cultura...</option>
+                            <option value="Milho">Milho (Grão)</option>
+                            <option value="Soja">Soja</option>
+                            <option value="Algodão">Algodão</option>
+                            <option value="Cana-de-açúcar">Cana-Soca</option>
+                            <option value="Café">Café (Produção)</option>
+                            <option value="Feijão">Feijão</option>
+                            <option value="Arroz">Arroz (Sequeiro)</option>
+                            <option value="Trigo">Trigo</option>
+                            <option value="Mandioca">Mandioca</option>
+                            <option value="Citros">Citros (Laranja)</option>
+                            <option value="Banana">Banana</option>
+                            <option value="Manga">Manga</option>
+                            <option value="Mamão">Mamão</option>
+                            <option value="Maracujá">Maracujá</option>
+                            <option value="Batata">Batata</option>
+                            <option value="Tomate">Tomate (Tutorado)</option>
+                            <option value="Alface">Alface</option>
+                            <option value="Cebola">Cebola</option>
+                            <option value="Cenoura">Cenoura</option>
+                            <option value="Repolho">Repolho</option>
+                            <option value="Pimentão">Pimentão</option>
+                            <option value="Pepino">Pepino</option>
+                            <option value="Abóbora">Abóbora (Italiana)</option>
+                            <option value="Pastagens">Pastagens (Manutenção)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl_produtividade">🎯 Produtividade Esperada:</label>
+                        <select id="cult_produtividade">
+                            <option value="">Aguardando Cultura...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <button type="button" class="btn-prev" onclick="nextStep(1)">⬅️ Voltar</button>
+                    <button type="button" onclick="nextStep(3)">Avançar ➡️</button>
+                </div>
+            </div>
+
+            <div class="step" id="step3">
+                <h2>🧪 Etapa 3: Análise Físico-Química do Solo</h2>
+                
+                <h3>Física e Complexo Acidez</h3>
+                <div class="grid-4">
+                    <div class="form-group"><label>Argila (%):</label><input type="number" id="s_argila" placeholder="Ex: 40"></div>
+                    <div class="form-group"><label>M.O. (dag/kg ou %):</label><input type="number" id="s_mo" placeholder="Ex: 2.5"></div>
+                    <div class="form-group"><label>pH (CaCl2):</label><input type="number" id="s_ph" step="0.1" placeholder="Ex: 5.2"></div>
+                    <div class="form-group"><label>Al+3 (cmolc):</label><input type="number" id="s_al" step="0.1" placeholder="Ex: 0.5"></div>
+                    <div class="form-group"><label>H+Al (cmolc):</label><input type="number" id="s_hal" step="0.1" placeholder="Ex: 4.0"></div>
+                </div>
+
+                <h3>Macronutrientes</h3>
+                <div class="grid-5">
+                    <div class="form-group"><label>P (mg/dm³):</label><input type="number" id="s_p" step="0.1" placeholder="Ex: 8.0"></div>
+                    <div class="form-group"><label>K (mg/dm³):</label><input type="number" id="s_k" step="0.1" placeholder="Ex: 60"></div>
+                    <div class="form-group"><label>Ca (cmolc):</label><input type="number" id="s_ca" step="0.1" placeholder="Ex: 2.0"></div>
+                    <div class="form-group"><label>Mg (cmolc):</label><input type="number" id="s_mg" step="0.1" placeholder="Ex: 0.8"></div>
+                    <div class="form-group"><label>S (mg/dm³):</label><input type="number" id="s_s" step="0.1" placeholder="Ex: 4.0"></div>
+                </div>
+
+                <h3>Micronutrientes (mg/dm³)</h3>
+                <div class="grid-5">
+                    <div class="form-group"><label>Boro (B):</label><input type="number" id="s_b" step="0.1" placeholder="Ex: 0.2"></div>
+                    <div class="form-group"><label>Cobre (Cu):</label><input type="number" id="s_cu" step="0.1" placeholder="Ex: 0.8"></div>
+                    <div class="form-group"><label>Ferro (Fe):</label><input type="number" id="s_fe" step="0.1" placeholder="Ex: 25"></div>
+                    <div class="form-group"><label>Manganês (Mn):</label><input type="number" id="s_mn" step="0.1" placeholder="Ex: 10"></div>
+                    <div class="form-group"><label>Zinco (Zn):</label><input type="number" id="s_zn" step="0.1" placeholder="Ex: 1.2"></div>
+                </div>
+
+                <div class="btn-container">
+                    <button type="button" class="btn-prev" onclick="nextStep(2)">⬅️ Voltar</button>
+                    <button type="button" onclick="nextStep(4)">Avançar ➡️</button>
+                </div>
+            </div>
+
+            <div class="step" id="step4">
+                <h2>⚙️ Etapa 4: Configuração de Insumos</h2>
+                
+                <div class="box-destaque">
+                    <h3>Critério de Calagem</h3>
+                    <div class="grid-3">
+                        <div class="form-group">
+                            <label>Método de Cálculo:</label>
+                            <select id="calc_metodo">
+                                <option value="v_bases">Elevação da Saturação por Bases (V%)</option>
+                                <option value="al_smp">Neutralização do Al³+ e Elevação de Ca/Mg</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>PRNT do Calcário (%):</label>
+                            <input type="number" id="calc_prnt" value="85">
+                        </div>
+                        <div class="form-group">
+                            <label>V% Almejada (Opcional):</label>
+                            <input type="number" id="v_personalizado" placeholder="Padrão do Manual">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box-destaque">
+                    <h3>Fontes de Adubos a utilizar</h3>
+                    <div class="grid-3">
+                        <div class="form-group">
+                            <label>Fonte de Fósforo (P):</label>
+                            <select id="fonte_p">
+                                <option value="MAP">MAP (11% N, 52% P2O5)</option>
+                                <option value="SS">Super Simples (18% P2O5, 10% S, 20% Ca)</option>
+                                <option value="TSP">Super Triplo (46% P2O5)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Fonte de Potássio (K):</label>
+                            <select id="fonte_k">
+                                <option value="KCL">Cloreto de Potássio - KCl (60% K2O)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Fonte de Nitrogênio (N):</label>
+                            <select id="fonte_n">
+                                <option value="UREIA">Ureia (45% N)</option>
+                                <option value="SAM">Sulfato de Amônio (21% N, 24% S)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <button type="button" class="btn-prev" onclick="nextStep(3)">⬅️ Voltar</button>
+                    <button type="button" class="btn-success" onclick="processarTalhao()">Gerar Laudo AgroSolo 📊</button>
+                </div>
+            </div>
+
+            <div class="step" id="step5">
+                <h2>📑 Laudos Agronômicos Gerados</h2>
+                
+                <div id="container-laudos">
+                    </div>
+
+                <div class="btn-container no-print">
+                    <button type="button" onclick="novoTalhao()">➕ Adicionar Novo Talhão</button>
+                    <button type="button" class="btn-success" onclick="window.print()">🖨️ Imprimir Laudos</button>
+                </div>
+            </div>
+
+        </form>
+
+        <p class="dev-info no-print">Desenvolvedor do APP: Dr Edson Neto | Contato: (98) 9 8445-8153</p>
+    </div>
+
+    <script>
+        // BANCO DE DADOS AGROSOLO (Extraído do PDF Oficial Embrapa/5ª Aprox)
+        // Estrutura: "Cultura" -> "Produtividade" -> { v: V%, n: N kg/ha, p: [Baixo, Médio, Adequado], k: [Baixo, Médio, Adequado] }
+        const dbAgroSolo = {
+            "Milho": {
+                "4 a 6 t/ha": { v: 60, n: 75, p: [80, 60, 30], k: [50, 40, 20] },
+                "6 a 8 t/ha": { v: 60, n: 115, p: [100, 80, 50], k: [70, 60, 40] },
+                "> 8 t/ha": { v: 60, n: 155, p: [120, 100, 70], k: [90, 80, 60] }
+            },
+            "Soja": {
+                "2,5 a 3,0 t/ha": { v: 50, n: 0, p: [120, 80, 40], k: [120, 80, 40] },
+                "3 a 5 t/ha": { v: 60, n: 0, p: [140, 110, 80], k: [100, 80, 60] }
+            },
+            "Algodão": {
+                "2,0 a 2,5 t/ha": { v: 60, n: 65, p: [100, 70, 40], k: [100, 70, 40] },
+                "3 t/ha": { v: 60, n: 100, p: [100, 80, 60], k: [100, 80, 60] }
+            },
+            "Cana-de-açúcar": {
+                "60 a 80 t/ha": { v: 60, n: 70, p: [80, 40, 0], k: [110, 70, 30] },
+                "80 a 100 t/ha": { v: 60, n: 100, p: [90, 70, 50], k: [190, 170, 150] }
+            },
+            "Café": {
+                "20 a 35 sacas/ha": { v: 50, n: 200, p: [80, 50, 20], k: [200, 150, 100] },
+                "35 a 50 sacas/ha": { v: 60, n: 300, p: [100, 70, 40], k: [350, 270, 200] }
+            },
+            "Feijão": {
+                "1,5 a 2,5 t/ha": { v: 55, n: 50, p: [70, 50, 30], k: [80, 60, 40] },
+                "> 2,5 t/ha": { v: 60, n: 80, p: [90, 70, 50], k: [90, 70, 50] }
+            },
+            "Arroz": {
+                "1 a 3 t/ha": { v: 50, n: 40, p: [70, 50, 30], k: [80, 60, 40] },
+                "3 a 5 t/ha": { v: 50, n: 80, p: [80, 60, 40], k: [100, 80, 60] }
+            },
+            "Trigo": {
+                "3 a 4 t/ha": { v: 55, n: 60, p: [80, 60, 40], k: [70, 50, 30] },
+                "4 a 6 t/ha": { v: 60, n: 100, p: [100, 80, 60], k: [80, 60, 40] }
+            },
+            "Mandioca": {
+                "20 a 30 t/ha": { v: 35, n: 30, p: [80, 60, 40], k: [80, 60, 40] },
+                "30 a 40 t/ha": { v: 60, n: 60, p: [100, 80, 60], k: [140, 120, 100] }
+            },
+            "Citros": {
+                "15 a 30 t/ha": { v: 70, n: 110, p: [70, 50, 30], k: [120, 80, 40] },
+                "30 a 45 t/ha": { v: 70, n: 170, p: [110, 90, 70], k: [180, 150, 120] }
+            },
+            "Banana": {
+                "15 a 25 t/ha": { v: 70, n: 200, p: [100, 60, 30], k: [400, 300, 200] },
+                "25 a 40 t/ha": { v: 70, n: 325, p: [130, 90, 60], k: [600, 500, 400] }
+            },
+            "Manga": {
+                "5 a 10 t/ha": { v: 60, n: 60, p: [60, 40, 20], k: [80, 60, 30] },
+                "10 a 20 t/ha": { v: 60, n: 120, p: [100, 80, 60], k: [120, 90, 60] }
+            },
+            "Mamão": { "50 t/ha": { v: 80, n: 80, p: [30, 20, 10], k: [90, 60, 30] } },
+            "Maracujá": { "2ª safra": { v: 70, n: 140, p: [90, 60, 30], k: [270, 180, 90] } },
+            "Batata": { "30 t/ha": { v: 60, n: 190, p: [420, 300, 120], k: [350, 220, 150] } },
+            "Tomate": { "100 t/ha": { v: 75, n: 400, p: [900, 800, 600], k: [800, 600, 400] } },
+            "Alface": { "21 t/ha": { v: 70, n: 150, p: [400, 300, 100], k: [120, 90, 60] } },
+            "Cebola": { "25 t/ha": { v: 70, n: 120, p: [300, 220, 100], k: [180, 120, 50] } },
+            "Cenoura": { "35 a 40 t/ha": { v: 65, n: 120, p: [320, 240, 160], k: [320, 240, 160] } },
+            "Repolho": { "50 t/ha": { v: 70, n: 150, p: [400, 300, 100], k: [240, 180, 100] } },
+            "Pimentão": { "30 t/ha": { v: 70, n: 100, p: [200, 160, 120], k: [160, 120, 80] } },
+            "Pepino": { "30 a 35 t/ha": { v: 75, n: 150, p: [180, 150, 120], k: [120, 100, 80] } },
+            "Abóbora": { "15 a 18 t/ha": { v: 70, n: 100, p: [160, 120, 80], k: [120, 90, 60] } },
+            "Pastagens": { "Manutenção": { v: 45, n: 125, p: [40, 25, 0], k: [100, 40, 0] } }
+        };
+
+        const dbMomentoN = {
+            "Milho": {
+                "cerrado": "1/5 a 1/3 no sulco de semeadura. O restante em cobertura quando a planta tiver de 4 a 8 folhas.",
+                "5aprox": "20 a 30 kg/ha no plantio. Restante parcelado: Argiloso (50% 6 folhas, 50% 12 folhas); Arenoso (50-25-25% com 6, 8 e 12 folhas)."
+            },
+            "Soja": {
+                "cerrado": "Não se aplica N mineral. Inoculação com Bradyrhizobium. Doses de 'arranque' são desencorajadas.",
+                "5aprox": "Inoculação das sementes. Dispensa adubação nitrogenada mineral."
+            },
+            "Algodão": {
+                "cerrado": "Parte no plantio (sulco). Cobertura parcelada: 50% aos 10 DAE e 50% no início dos botões florais.",
+                "5aprox": "20 a 40 kg/ha no plantio. Cobertura aos 25-30 DAE. (Em altos níveis parcelar)."
+            },
+            "Cana-de-açúcar": {
+                "cerrado": "Cana-soca: 80 a 100 kg/ha aplicados no início das chuvas.",
+                "5aprox": "Aplicar no início das chuvas em cobertura."
+            },
+            "Café": {
+                "cerrado": "Produção: Parcelar a dose anual em 3 a 4 vezes entre Outubro e Março.",
+                "5aprox": "Produção: Parcelar em 3 a 4 vezes no período chuvoso."
+            },
+            "Feijão": {
+                "cerrado": "Pequena dose no sulco. Cobertura principal aos 30 DAE. (Se dose > 40kg, parcelar 25 e 40 DAE).",
+                "5aprox": "20 kg/ha no plantio. O restante em cobertura, parcelado."
+            },
+            "Arroz": {
+                "cerrado": "Pequena dose no plantio. 50% no perfilhamento e 50% no primórdio floral.",
+                "5aprox": "1/5 no plantio e 4/5 em cobertura na diferenciação do primórdio floral (50-55 DAE)."
+            },
+            "Trigo": {
+                "cerrado": "Sulco no plantio. Cobertura no início do perfilhamento (aprox. 14 DAE).",
+                "5aprox": "Parte no plantio. Cobertura aos 15 DAE."
+            },
+            "Mandioca": {
+                "cerrado": "Tudo em cobertura. Aplicar 30 a 60 dias após a brotação.",
+                "5aprox": "Dose total aplicada em cobertura entre 30 a 60 dias após brotação."
+            },
+            "Citros": {
+                "cerrado": "Produção: Parcelar em 3 vezes durante o período chuvoso.",
+                "5aprox": "Produção: Dias antes da floração (Ago), após queda das pétalas, e frutos em crescimento."
+            },
+            "Banana": {
+                "cerrado": "Na produção, parcelar em 3 vezes (chuvas) ou até 6 vezes (irrigado).",
+                "5aprox": "Planta mãe: Pegamento, 2 meses após e na inflorescência. Planta filha: Colheita da mãe e 2 meses após."
+            },
+            "Pastagens": {
+                "cerrado": "Na manutenção, aplicar no terço final das chuvas para prolongar oferta na seca.",
+                "5aprox": "Na manutenção, parcelar de 2 a 3 vezes (início, meio e fim das chuvas)."
+            }
+        };
+
+        // VALIDAÇÃO DE SENHA E INICIALIZAÇÃO
+        document.addEventListener("DOMContentLoaded", () => {
+            // Verifica o token de acesso
+            const isAuth = localStorage.getItem('agrosolo_auth');
+            if (isAuth === 'true') {
+                document.getElementById('login-overlay').style.display = 'none';
+            }
+
+            // Carrega Estados do IBGE
+            fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome')
+                .then(response => response.json())
+                .then(estados => {
+                    const select = document.getElementById('id_estado');
+                    estados.forEach(est => {
+                        let option = document.createElement('option');
+                        option.value = est.sigla; option.text = `${est.nome} (${est.sigla})`;
+                        select.appendChild(option);
+                    });
+                });
+        });
+
+        function carregarMunicipios() {
+            const uf = document.getElementById('id_estado').value;
+            const selectMun = document.getElementById('id_municipio');
+            selectMun.innerHTML = '<option value="">Carregando...</option>';
+            if(!uf) return;
+            fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`)
+                .then(res => res.json())
+                .then(municipios => {
+                    selectMun.innerHTML = '';
+                    municipios.forEach(m => {
+                        let option = document.createElement('option');
+                        option.value = m.nome; option.text = m.nome;
+                        selectMun.appendChild(option);
+                    });
+                });
+        }
+
+        // Atualização Dinâmica do Select de Produtividade Baseado na Cultura
+        function atualizarUnidadeProdutividade() {
+            const cultura = document.getElementById('cult_cultura').value;
+            const selectProd = document.getElementById('cult_produtividade');
+            
+            selectProd.innerHTML = '';
+            
+            if (!cultura || !dbAgroSolo[cultura]) {
+                selectProd.innerHTML = '<option value="">Selecione a cultura primeiro...</option>';
+                return;
+            }
+
+            const faixas = Object.keys(dbAgroSolo[cultura]);
+            faixas.forEach(faixa => {
+                let option = document.createElement('option');
+                option.value = faixa;
+                option.text = faixa;
+                selectProd.appendChild(option);
+            });
+        }
+
+        function nextStep(step) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step' + step).classList.add('active');
+            document.getElementById('progressBar').style.width = (step / 5) * 100 + '%';
+        }
+
+        function novoTalhao() {
+            document.getElementById('id_talhao').value = "";
+            document.getElementById('id_area').value = "";
+            const inputs = ['s_argila','s_mo','s_ph','s_al','s_hal','s_p','s_k','s_ca','s_mg','s_s','s_b','s_cu','s_fe','s_mn','s_zn', 'v_personalizado'];
+            inputs.forEach(id => document.getElementById(id).value = "");
+            nextStep(2); 
+        }
+
+        // MOTOR AGRONÔMICO AVANÇADO (AGROSOLO - BASE PDF EMBRAPA / 5ª APROX)
+        function processarTalhao() {
+            // 1. Dados Base
+            const manual = document.getElementById('config_manual').value;
+            const cultura = document.getElementById('cult_cultura').value;
+            const prod = document.getElementById('cult_produtividade').value;
+            const talhao = document.getElementById('id_talhao').value || "Não Identificado";
+            const prnt = parseFloat(document.getElementById('calc_prnt').value) || 85;
+
+            if(!cultura || !prod) {
+                alert("Por favor, selecione a Cultura e a Produtividade Esperada na Etapa 2.");
+                return nextStep(2);
+            }
+
+            // 2. Variaveis do Solo
+            const p = parseFloat(document.getElementById('s_p').value) || 0;
+            const k = parseFloat(document.getElementById('s_k').value) || 0;
+            const ca = parseFloat(document.getElementById('s_ca').value) || 0;
+            const mg = parseFloat(document.getElementById('s_mg').value) || 0;
+            const al = parseFloat(document.getElementById('s_al').value) || 0;
+            const hal = parseFloat(document.getElementById('s_hal').value) || 0;
+            const s = parseFloat(document.getElementById('s_s').value) || 0;
+            const b = parseFloat(document.getElementById('s_b').value) || 0;
+            const cu = parseFloat(document.getElementById('s_cu').value) || 0;
+            const fe = parseFloat(document.getElementById('s_fe').value) || 0;
+            const mn = parseFloat(document.getElementById('s_mn').value) || 0;
+            const zn = parseFloat(document.getElementById('s_zn').value) || 0;
+            const argila = parseFloat(document.getElementById('s_argila').value) || 0;
+
+            const sb = ca + mg + (k / 390);
+            const ctc_t = sb + al;
+            const ctc_T = sb + hal;
+            const v_atual = ctc_T > 0 ? (sb / ctc_T) * 100 : 0;
+
+            // 3. CLASSIFICAÇÃO NÍVEIS CRÍTICOS (Baseado no PDF)
+            function classificar(valor, deficiente, adequado) {
+                if(valor <= deficiente) return { status: 0, html: `<span class="status-baixo">Baixo</span>` };
+                if(valor > adequado) return { status: 2, html: `<span class="status-alto">Adequado/Alto</span>` };
+                return { status: 1, html: `<span class="status-medio">Médio</span>` };
+            }
+
+            // Nível de Fósforo (Baseado em Argila/Textura do PDF)
+            let st_P;
+            if (argila > 60) st_P = classificar(p, 5.4, 8.0);
+            else if (argila >= 35) st_P = classificar(p, 8.0, 12.0);
+            else if (argila >= 15) st_P = classificar(p, 12.0, 20.0);
+            else st_P = classificar(p, 20.0, 30.0);
+
+            // Nível de Potássio
+            let st_K = classificar(k, 40, 70);
+            
+            // Outros Macros
+            let st_Ca = classificar(ca, 1.20, 2.40);
+            let st_Mg = classificar(mg, 0.45, 0.90);
+            let st_S = classificar(s, 5.0, 7.0);
+            
+            // Micronutrientes
+            let st_B = classificar(b, 0.35, 0.60);
+            let st_Cu = classificar(cu, 0.7, 1.2);
+            let st_Fe = classificar(fe, 18, 30);
+            let st_Mn = classificar(mn, 2, 5);
+            let st_Zn = classificar(zn, 0.9, 1.5);
+
+            // 4. LÓGICA DE DOSAGEM EXATA E V%
+            const dadosCult = dbAgroSolo[cultura][prod];
+            
+            // Gerenciamento da Saturação por Bases (V%)
+            let v_alvo_manual = dadosCult.v;
+            let v_personalizado_input = document.getElementById('v_personalizado').value;
+            let v_alvo_pessoal = v_personalizado_input ? parseFloat(v_personalizado_input) : null;
+            let v_alvo_calculo = v_alvo_pessoal !== null ? v_alvo_pessoal : v_alvo_manual;
+
+            let req_N = dadosCult.n;
+            let req_P2O5 = dadosCult.p[st_P.status]; // Pega array [Baixo, Médio, Adequado]
+            let req_K2O = dadosCult.k[st_K.status];
+
+            // 5. CÁLCULO DE CALCÁRIO
+            let nc = 0;
+            if(document.getElementById('calc_metodo').value === "v_bases") {
+                if(v_atual < v_alvo_calculo && ctc_T > 0) nc = ((v_alvo_calculo - v_atual) * ctc_T) / prnt;
+            } else {
+                let defic_ca_mg = 2 - (ca + mg);
+                nc = (2 * al + (defic_ca_mg > 0 ? defic_ca_mg : 0)) * (100/prnt);
+            }
+            nc = nc < 0 ? 0 : nc;
+            let tipo_calc = (mg < 0.9 || (ca/mg) > 4) ? "Dolomítico (Foco em Magnésio)" : "Calcítico (Foco em Cálcio)";
+
+            // 6. CÁLCULO FÍSICO DOS ADUBOS
+            const f_P = document.getElementById('fonte_p').value;
+            const f_K = document.getElementById('fonte_k').value;
+            const f_N = document.getElementById('fonte_n').value;
+
+            let qtd_P = 0, n_fornecido = 0;
+            if(f_P === "MAP") { qtd_P = req_P2O5 / 0.52; n_fornecido = qtd_P * 0.11; }
+            else if(f_P === "SS") { qtd_P = req_P2O5 / 0.18; }
+            else if(f_P === "TSP") { qtd_P = req_P2O5 / 0.46; }
+
+            let qtd_K = req_K2O / 0.60;
+            let req_N_rest = Math.max(0, req_N - n_fornecido);
+            let qtd_N = f_N === "UREIA" ? req_N_rest / 0.45 : req_N_rest / 0.21;
+
+            // Parcelamento e Momento de Aplicação
+            let rec_fund = `- ${Math.ceil(qtd_P)} kg/ha de ${f_P}\n`;
+            let rec_cob = "";
+            let momento_aplicacao_N = "Parcelar em cobertura conforme recomendação técnica padrão da cultura.";
+
+            if (dbMomentoN[cultura]) {
+                momento_aplicacao_N = dbMomentoN[cultura][manual] || dbMomentoN[cultura]["5aprox"];
+            }
+
+            if(qtd_K > 80) {
+                rec_fund += `- 80 kg/ha de KCl\n`;
+                rec_cob += `- ${Math.ceil(qtd_K - 80)} kg/ha de KCl (Cobertura)\n`;
+            } else if(qtd_K > 0) { 
+                rec_fund += `- ${Math.ceil(qtd_K)} kg/ha de KCl\n`; 
+            }
+
+            if(cultura === "Soja") {
+                rec_fund += `- Inoculação das sementes recomendada.\n`;
+            } else if (qtd_N > 0) {
+                let n_fund = Math.min(qtd_N, 80); // Limite no sulco
+                rec_fund += `- ${Math.ceil(n_fund)} kg/ha de ${f_N}\n`;
+                if(qtd_N > n_fund) rec_cob += `- ${Math.ceil(qtd_N - n_fund)} kg/ha de ${f_N} (Fracionar Cobertura)\n`;
+            }
+
+            // 7. MONTAGEM DO LAUDO
+            const laudoHTML = `
+                <div class="laudo-card">
+                    <h3 style="margin-top:0;">🚜 TALHÃO: ${talhao.toUpperCase()}</h3>
+                    <p><strong>Cultura:</strong> ${document.getElementById('cult_cultura').options[document.getElementById('cult_cultura').selectedIndex].text} | <strong>Produtividade Alvo:</strong> ${prod}</p>
+                    <p><strong>Base Técnica (Adubação/Calagem):</strong> ${document.getElementById('config_manual').options[document.getElementById('config_manual').selectedIndex].text}</p>
+                    <hr style="margin: 15px 0; border: 0; border-top: 1px dashed #ccc;">
+                    
+                    <div class="bloco-laudo">
+                        <h4>📊 INTERPRETAÇÃO DETALHADA DOS NUTRIENTES</h4>
+                        <div class="interpretacao-grid">
+                            <div><strong>Nitrogênio (N):</strong> <em>*Não se interpreta via solo </em></div>
+                            <div><strong>Fósforo (P):</strong> ${p} mg/dm³ -> ${st_P.html}</div>
+                            <div><strong>Potássio (K):</strong> ${k} mg/dm³ -> ${st_K.html}</div>
+                            <div><strong>Cálcio (Ca):</strong> ${ca} cmolc/dm³ -> ${st_Ca.html}</div>
+                            <div><strong>Magnésio (Mg):</strong> ${mg} cmolc/dm³ -> ${st_Mg.html}</div>
+                            <div><strong>Enxofre (S):</strong> ${s} mg/dm³ -> ${st_S.html}</div>
+                            <div><strong>Boro (B):</strong> ${b} mg/dm³ -> ${st_B.html}</div>
+                            <div><strong>Cobre (Cu):</strong> ${cu} mg/dm³ -> ${st_Cu.html}</div>
+                            <div><strong>Ferro (Fe):</strong> ${fe} mg/dm³ -> ${st_Fe.html}</div>
+                            <div><strong>Manganês (Mn):</strong> ${mn} mg/dm³ -> ${st_Mn.html}</div>
+                            <div><strong>Zinco (Zn):</strong> ${zn} mg/dm³ -> ${st_Zn.html}</div>
+                        </div>
+                        <p style="margin-top:10px;">
+                            <strong>Saturação por Bases (V%):</strong> Atual: ${v_atual.toFixed(1)}% | 
+                            <strong>Alvo do Manual:</strong> ${v_alvo_manual}% 
+                            ${v_alvo_pessoal !== null ? `| <strong>Alvo Pessoal (Aplicado):</strong> ${v_alvo_pessoal}%` : ''}
+                        </p>
+                    </div>
+
+                    <div class="bloco-laudo">
+                        <h4>⚖️ CORREÇÃO DO SOLO (CALAGEM)</h4>
+                        <p><strong>Necessidade de Calcário:</strong> ${nc > 0 ? nc.toFixed(2) + " Toneladas/ha" : "<span class='status-alto'>Dispensa Calagem para o alvo escolhido.</span>"}</p>
+                        ${nc > 0 ? `<p><strong>Tipo Recomendado:</strong> Calcário ${tipo_calc}</p>` : ""}
+                    </div>
+
+                    <div class="bloco-laudo">
+                        <h4>🌿 RECOMENDAÇÃO DE ADUBAÇÃO (PRODUTO FÍSICO)</h4>
+                        <p><strong>Nutrientes Puro:</strong> N: ${Math.ceil(req_N)} kg/ha | P2O5: ${Math.ceil(req_P2O5)} kg/ha | K2O: ${Math.ceil(req_K2O)} kg/ha</p>
+                        
+                        <div style="background:#FFF3E0; padding:10px; border-radius:5px; margin-top:10px;">
+                            <strong>A) FUNDAÇÃO (No sulco/plantio):</strong><br>
+                            ${rec_fund}
+                        </div>
+                        
+                        ${rec_cob !== "" ? `
+                        <div style="background:#E8F5E9; padding:10px; border-radius:5px; margin-top:10px;">
+                            <strong>B) COBERTURA (Pós-emergência):</strong><br>
+                            ${rec_cob}
+                        </div>` : ""}
+                        
+                        <div style="background:#E1F5FE; padding:10px; border-radius:5px; margin-top:10px;">
+                            <strong>🕒 Momento de Aplicação (N):</strong><br>
+                            <em>${momento_aplicacao_N}</em>
+                        </div>
+
+                        <p style="font-size:10pt; color:#666; margin-top:10px;">* Se micronutrientes constam como Baixos, aplicar fontes solúveis via foliar ou adicionados aos formulados de solo.</p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('container-laudos').insertAdjacentHTML('beforeend', laudoHTML);
+            nextStep(5);
+        }
+    </script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAA47f1gCMH4nqFaM2y-RTMvDhYrMK28wI",
+        authDomain: "agrosoloapp.firebaseapp.com",
+        projectId: "agrosoloapp",
+        storageBucket: "agrosoloapp.firebasestorage.app",
+        messagingSenderId: "695468583546",
+        appId: "1:695468583546:web:1934f3501a8f0cb83429c3"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    document.getElementById('btn-login').addEventListener('click', async () => {
+        const email = document.getElementById('email-acesso').value.trim();
+        const senha = document.getElementById('senha-acesso').value.trim();
+        const msgErro = document.getElementById('msg-erro');
+        const btnLogin = document.getElementById('btn-login');
+
+        if (!email || !senha) {
+            msgErro.innerText = "Por favor, preencha o e-mail e a senha.";
+            msgErro.style.display = "block";
+            return;
+        }
+
+        try {
+            msgErro.style.display = "none";
+            btnLogin.innerText = "Autenticando...";
+            btnLogin.disabled = true;
+
+            const userCredential = await signInWithEmailAndPassword(auth, email, senha);
+            const user = userCredential.user;
+            const userDocRef = doc(db, "usuarios", user.uid);
+            const userDoc = await getDoc(userDocRef);
+
+            if (userDoc.exists()) {
+                const prazoAcessoStr = userDoc.data().prazo;
+                if (prazoAcessoStr) {
+                    const dataExpiracao = new Date(prazoAcessoStr + "T23:59:59");
+                    if (new Date() <= dataExpiracao) {
+                        // Prazo válido: Fecha a tela de login
+                        document.getElementById('login-overlay').style.display = 'none';
+                        localStorage.setItem('agrosolo_auth', 'true');
+                    } else {
+                        await signOut(auth);
+                        msgErro.innerText = "Acesso negado: Seu prazo expirou.";
+                        msgErro.style.display = "block";
+                    }
+                } else {
+                    await signOut(auth);
+                    msgErro.innerText = "Erro: Prazo não configurado no banco.";
+                    msgErro.style.display = "block";
+                }
+            } else {
+                await signOut(auth);
+                msgErro.innerText = "Erro: Usuário não encontrado no banco.";
+                msgErro.style.display = "block";
+            }
+        } catch (error) {
+            msgErro.style.display = "block";
+            msgErro.innerText = "E-mail ou senha incorretos.";
+        } finally {
+            btnLogin.innerText = "Entrar";
+            btnLogin.disabled = false;
+        }
+    });
+</script>
+</body>
+</html>
