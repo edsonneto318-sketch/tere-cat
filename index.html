@@ -17,85 +17,138 @@
             --info: #1565C0;
         }
 
-        * { box-sizing: border-box; font-family: 'Times New Roman', Times, serif; font-size: 12pt; margin: 0; padding: 0; }
-        body { background-color: var(--brown-bg); color: var(--brown-dark); display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
+        * { box-sizing: border-box; font-family: 'Times New Roman', Times, serif; font-size: 12pt;
+        margin: 0; padding: 0; }
+        body { background-color: var(--brown-bg); color: var(--brown-dark); display: flex;
+        flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
         
-        h1, h2, h3, h4 { text-align: center; color: var(--brown-dark); margin-bottom: 15px; }
-        h1 { font-size: 20pt; border-bottom: 2px solid var(--brown-medium); padding-bottom: 10px; }
-        h2 { font-size: 16pt; }
-        h3 { font-size: 14pt; margin-top: 20px; text-align: left; border-left: 4px solid var(--accent); padding-left: 10px; }
+        h1, h2, h3, h4 { text-align: center;
+        color: var(--brown-dark); margin-bottom: 15px; }
+        h1 { font-size: 20pt; border-bottom: 2px solid var(--brown-medium);
+        padding-bottom: 10px; }
+        h2 { font-size: 16pt;
+        }
+        h3 { font-size: 14pt; margin-top: 20px; text-align: left; border-left: 4px solid var(--accent);
+        padding-left: 10px; }
 
         .app-container {
-            background: #ffffff; width: 100%; max-width: 950px; border-radius: 12px;
+            background: #ffffff;
+            width: 100%; max-width: 950px; border-radius: 12px;
             box-shadow: 0 10px 25px rgba(62, 39, 35, 0.15); padding: 30px; position: relative;
         }
 
         /* OVERLAY DE LOGIN */
         #login-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(62, 39, 35, 0.95); z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
         }
         .login-box {
-            background: white; padding: 40px; border-radius: 12px; text-align: center;
+            background: white;
+            padding: 40px; border-radius: 12px; text-align: center;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 90%; max-width: 400px;
         }
-        .login-box h2 { color: var(--brown-dark); margin-bottom: 10px; }
-        .login-box p { color: var(--brown-medium); margin-bottom: 20px; font-size: 11pt; }
-        .login-box input { margin-bottom: 15px; text-align: center; font-size: 14pt; letter-spacing: 2px; }
+        .login-box h2 { color: var(--brown-dark); margin-bottom: 10px;
+        }
+        .login-box p { color: var(--brown-medium); margin-bottom: 20px; font-size: 11pt;
+        }
+        .login-box input { margin-bottom: 15px; text-align: center; font-size: 14pt; letter-spacing: 2px;
+        }
 
         /* PROGRESSO E ETAPAS */
-        .progress-container { width: 100%; background-color: #D7CCC8; border-radius: 8px; margin-bottom: 25px; height: 12px; overflow: hidden; }
-        .progress-bar { height: 100%; background-color: var(--brown-medium); width: 20%; transition: width 0.4s ease; }
-        .step { display: none; animation: fadeIn 0.4s; }
-        .step.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .progress-container { width: 100%;
+        background-color: #D7CCC8; border-radius: 8px; margin-bottom: 25px; height: 12px; overflow: hidden;
+        }
+        .progress-bar { height: 100%; background-color: var(--brown-medium); width: 20%; transition: width 0.4s ease;
+        }
+        .step { display: none; animation: fadeIn 0.4s;
+        }
+        .step.active { display: block;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px);
+        } to { opacity: 1; transform: translateY(0); } }
 
         /* FORMULÁRIOS */
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--brown-medium); }
+        .form-group { margin-bottom: 15px;
+        }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--brown-medium);
+        }
         input, select {
-            width: 100%; padding: 10px; border: 1px solid #BCAAA4; border-radius: 6px;
+            width: 100%;
+            padding: 10px; border: 1px solid #BCAAA4; border-radius: 6px;
             background-color: #FAFAFA; color: #333; transition: border 0.3s;
         }
-        input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 5px rgba(255, 179, 0, 0.3); }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
-        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+        input:focus, select:focus { outline: none; border-color: var(--accent);
+        box-shadow: 0 0 5px rgba(255, 179, 0, 0.3); }
+        .grid-2 { display: grid;
+        grid-template-columns: 1fr 1fr; gap: 15px; }
+        .grid-3 { display: grid;
+        grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        .grid-4 { display: grid;
+        grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr);
+        gap: 10px; }
         
-        .box-destaque { background: #FFF8E1; border: 1px dashed var(--accent); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .box-destaque { background: #FFF8E1;
+        border: 1px dashed var(--accent); padding: 15px; border-radius: 8px; margin-bottom: 20px;
+        }
 
         /* BOTÕES */
-        .btn-container { display: flex; justify-content: space-between; margin-top: 25px; border-top: 1px solid #E0E0E0; padding-top: 15px; }
+        .btn-container { display: flex;
+        justify-content: space-between; margin-top: 25px; border-top: 1px solid #E0E0E0; padding-top: 15px; gap: 10px; flex-wrap: wrap;
+        }
         button {
-            background-color: var(--brown-medium); color: white; border: none; padding: 12px 24px;
+            background-color: var(--brown-medium);
+            color: white; border: none; padding: 12px 24px;
             border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.3s;
         }
-        button:hover { background-color: var(--brown-dark); transform: translateY(-2px); }
-        .btn-prev { background-color: var(--brown-light); }
-        .btn-success { background-color: var(--success); width: 100%; max-width: 300px; }
-        .btn-success:hover { background-color: #1B5E20; }
-        .btn-container .btn-success { width: auto; max-width: none; }
+        button:hover { background-color: var(--brown-dark); transform: translateY(-2px);
+        }
+        .btn-prev { background-color: var(--brown-light);
+        }
+        .btn-success { background-color: var(--success); width: 100%; max-width: 300px;
+        }
+        .btn-success:hover { background-color: #1B5E20;
+        }
+        .btn-danger { background-color: var(--danger); font-size: 10pt; padding: 8px 16px; }
+        .btn-danger:hover { background-color: #9A0000; }
+        .btn-home { background-color: #546E7A; }
+        .btn-home:hover { background-color: #37474F; }
+        .btn-container .btn-success { width: auto; max-width: none;
+        }
         
         /* LAUDOS */
-        #container-laudos { display: flex; flex-direction: column; gap: 20px; }
-        .laudo-card { border: 2px solid var(--brown-medium); border-radius: 8px; padding: 20px; background: #FAFAFA; }
-        .bloco-laudo { margin-bottom: 15px; padding: 15px; background: white; border-left: 4px solid var(--brown-medium); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        #container-laudos { display: flex;
+        flex-direction: column; gap: 20px; }
+        .laudo-card { border: 2px solid var(--brown-medium); border-radius: 8px;
+        padding: 20px; background: #FAFAFA; position: relative; }
+        .bloco-laudo { margin-bottom: 15px; padding: 15px; background: white;
+        border-left: 4px solid var(--brown-medium); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         
-        .status-alto { color: var(--success); font-weight: bold; }
-        .status-medio { color: var(--accent); font-weight: bold; }
-        .status-baixo { color: var(--danger); font-weight: bold; }
+        .status-alto { color: var(--success);
+        font-weight: bold; }
+        .status-medio { color: var(--accent); font-weight: bold;
+        }
+        .status-baixo { color: var(--danger); font-weight: bold;
+        }
 
-        .dev-info { font-size: 8pt; text-align: center; margin-top: 30px; color: var(--brown-light); border-top: 1px solid #eee; padding-top: 10px; }
+        .dev-info { font-size: 8pt; text-align: center; margin-top: 30px; color: var(--brown-light);
+        border-top: 1px solid #eee; padding-top: 10px; }
 
-        .interpretacao-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11pt; }
+        .interpretacao-grid { display: grid;
+        grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11pt; }
 
         @media print {
-            body { background: white; }
-            .app-container { box-shadow: none; padding: 0; }
-            button, .progress-container, .no-print { display: none; }
-            .laudo-card { page-break-inside: avoid; border: 1px solid #000; }
+            body { background: white;
+            }
+            .app-container { box-shadow: none; padding: 0;
+            }
+            button, .progress-container, .no-print { display: none !important;
+            }
+            .laudo-card { page-break-inside: avoid; border: 1px solid #000; margin-bottom: 20px;
+            }
         }
     </style>
 </head>
@@ -106,6 +159,7 @@
             <h2>🌾 AgroSolo</h2>
             <p>Acesso Restrito ao Sistema Especialista</p>
             <input type="email" id="email-acesso" placeholder="Digite seu e-mail..." style="margin-bottom: 15px; text-align: center; font-size: 14pt; width: 100%; border: 1px solid #BCAAA4; border-radius: 6px; padding: 10px;">
+            
             <input type="password" id="senha-acesso" placeholder="Digite sua senha...">
             <button type="button" class="btn-success" id="btn-login">Entrar</button>
             <p id="msg-erro" style="color: var(--danger); display: none; margin-top: 10px; font-weight: bold;"></p>
@@ -123,8 +177,9 @@
             
             <div class="step active" id="step1">
                 <h2>📋 Etapa 1: Dados Gerais e Localização</h2>
+                
                 <div class="grid-2">
-                    <div class="form-group"><label>🧑‍🌾 Responsável pela interpretação e recomendação:</label><input type="text" id="id_profissional" placeholder="Nome do Responsável"></div>
+                    <div class="form-group"><label>🧑‍🌾 Responsável pela interpretação:</label><input type="text" id="id_profissional" placeholder="Nome do Responsável"></div>
                     <div class="form-group"><label>📅 Data da Análise:</label><input type="date" id="id_data"></div>
                     <div class="form-group"><label>🚜 Propriedade / Fazenda:</label><input type="text" id="id_fazenda" placeholder="Nome da Propriedade"></div>
                     <div class="form-group"><label>👤 Proprietário:</label><input type="text" id="id_proprietario" placeholder="Nome do Proprietário"></div>
@@ -157,8 +212,8 @@
                 
                 <div class="box-destaque">
                     <label>📖 Base Técnica / Manual de Recomendação:</label>
-                    <select id="config_manual">
-                        <option value="5aprox">5ª Aproximação de Minas Gerais (CFSEMG)</option>
+                    <select id="config_manual" onchange="atualizarUnidadeProdutividade()">
+                        <option value="5aprox">5ª Aproximação de Minas Gerais (EPAMIG/CFSEMG)</option>
                         <option value="cerrado">Correção e Adubação do Cerrado (Embrapa)</option>
                     </select>
                     <small style="color:var(--info);">* A escolha do manual altera os níveis críticos, a exigência de calagem e as curvas de dosagem de adubos.</small>
@@ -310,10 +365,10 @@
             <div class="step" id="step5">
                 <h2>📑 Laudos Agronômicos Gerados</h2>
                 
-                <div id="container-laudos">
-                    </div>
+                <div id="container-laudos"></div>
 
-                <div class="btn-container no-print">
+                <div class="btn-container no-print" style="justify-content: center; gap: 15px;">
+                    <button type="button" class="btn-home" onclick="resetarPropriedade()">🏠 Início / Nova Propriedade</button>
                     <button type="button" onclick="novoTalhao()">➕ Adicionar Novo Talhão</button>
                     <button type="button" class="btn-success" onclick="window.print()">🖨️ Imprimir Laudos</button>
                 </div>
@@ -325,70 +380,151 @@
     </div>
 
     <script>
-        // BANCO DE DADOS AGROSOLO (Extraído do PDF Oficial Embrapa/5ª Aprox)
-        // Estrutura: "Cultura" -> "Produtividade" -> { v: V%, n: N kg/ha, p: [Baixo, Médio, Adequado], k: [Baixo, Médio, Adequado] }
+        // BANCO DE DADOS AGROSOLO (Revisado para separar rigidamente 5ª Aprox e Cerrado)
         const dbAgroSolo = {
             "Milho": {
-                "4 a 6 t/ha": { v: 60, n: 75, p: [80, 60, 30], k: [50, 40, 20] },
-                "6 a 8 t/ha": { v: 60, n: 115, p: [100, 80, 50], k: [70, 60, 40] },
-                "> 8 t/ha": { v: 60, n: 155, p: [120, 100, 70], k: [90, 80, 60] }
+                "cerrado": {
+                    "6 a 8 t/ha": { v: 60, n: 80, p: [120, 90, 60], k: [80, 60, 40] },
+                    "8 a 10 t/ha": { v: 60, n: 140, p: [140, 110, 80], k: [100, 80, 60] },
+                    "10 a 12 t/ha": { v: 60, n: 200, p: [160, 130, 100], k: [120, 100, 80] }
+                },
+                "5aprox": {
+                    "4 a 6 t/ha": { v: 60, n: 75, p: [80, 60, 30], k: [50, 40, 20] },
+                    "6 a 8 t/ha": { v: 60, n: 115, p: [100, 80, 50], k: [70, 60, 40] },
+                    "> 8 t/ha": { v: 60, n: 155, p: [120, 100, 70], k: [90, 80, 60] }
+                }
             },
             "Soja": {
-                "2,5 a 3,0 t/ha": { v: 50, n: 0, p: [120, 80, 40], k: [120, 80, 40] },
-                "3 a 5 t/ha": { v: 60, n: 0, p: [140, 110, 80], k: [100, 80, 60] }
+                "cerrado": { "3 a 5 t/ha": { v: 60, n: 0, p: [80, 60, 40], k: [80, 60, 40] } },
+                "5aprox": { "2,5 a 3,0 t/ha": { v: 50, n: 0, p: [120, 80, 40], k: [120, 80, 40] } }
             },
             "Algodão": {
-                "2,0 a 2,5 t/ha": { v: 60, n: 65, p: [100, 70, 40], k: [100, 70, 40] },
-                "3 t/ha": { v: 60, n: 100, p: [100, 80, 60], k: [100, 80, 60] }
+                "cerrado": { "3 t/ha": { v: 50, n: 30, p: [100, 80, 60], k: [100, 80, 60] } },
+                "5aprox": { "2,0 a 2,5 t/ha": { v: 60, n: 65, p: [100, 70, 40], k: [100, 70, 40] } }
             },
             "Cana-de-açúcar": {
-                "60 a 80 t/ha": { v: 60, n: 70, p: [80, 40, 0], k: [110, 70, 30] },
-                "80 a 100 t/ha": { v: 60, n: 100, p: [90, 70, 50], k: [190, 170, 150] }
+                "cerrado": {
+                    "60 a 80 t/ha": { v: 60, n: 80, p: [80, 40, 0], k: [110, 70, 30] },
+                    "> 80 t/ha": { v: 60, n: 100, p: [100, 40, 0], k: [140, 100, 60] }
+                },
+                "5aprox": {
+                    "60 a 80 t/ha": { v: 50, n: 60, p: [70, 50, 30], k: [140, 120, 100] },
+                    "80 a 100 t/ha": { v: 50, n: 100, p: [90, 70, 50], k: [190, 170, 150] }
+                }
             },
             "Café": {
-                "20 a 35 sacas/ha": { v: 50, n: 200, p: [80, 50, 20], k: [200, 150, 100] },
-                "35 a 50 sacas/ha": { v: 60, n: 300, p: [100, 70, 40], k: [350, 270, 200] }
+                "cerrado": {
+                    "20 a 35 sacas/ha": { v: 50, n: 200, p: [80, 50, 30], k: [200, 150, 150] },
+                    "35 a 50 sacas/ha": { v: 50, n: 300, p: [100, 70, 50], k: [350, 270, 275] }
+                },
+                "5aprox": {
+                    "21 a 30 sacas/ha": { v: 60, n: 175, p: [40, 30, 20], k: [140, 110, 80] },
+                    "41 a 50 sacas/ha": { v: 60, n: 275, p: [60, 50, 30], k: [230, 180, 130] }
+                }
             },
             "Feijão": {
-                "1,5 a 2,5 t/ha": { v: 55, n: 50, p: [70, 50, 30], k: [80, 60, 40] },
-                "> 2,5 t/ha": { v: 60, n: 80, p: [90, 70, 50], k: [90, 70, 50] }
+                "cerrado": {
+                    "1,5 a 2,5 t/ha": { v: 55, n: 35, p: [80, 60, 40], k: [70, 50, 30] },
+                    "2,5 a 3,5 t/ha": { v: 55, n: 60, p: [90, 70, 50], k: [80, 60, 40] }
+                },
+                "5aprox": {
+                    "1,8 a 2,5 t/ha": { v: 50, n: 70, p: [90, 70, 50], k: [40, 30, 20] },
+                    "> 2,5 t/ha": { v: 50, n: 100, p: [110, 90, 70], k: [50, 40, 20] }
+                }
             },
             "Arroz": {
-                "1 a 3 t/ha": { v: 50, n: 40, p: [70, 50, 30], k: [80, 60, 40] },
-                "3 a 5 t/ha": { v: 50, n: 80, p: [80, 60, 40], k: [100, 80, 60] }
+                "cerrado": {
+                    "1 a 3 t/ha": { v: 55, n: 25, p: [80, 60, 40], k: [70, 50, 30] },
+                    "3 a 5 t/ha": { v: 55, n: 80, p: [100, 80, 60], k: [80, 60, 40] }
+                },
+                "5aprox": { "2,5 a 3,0 t/ha": { v: 45, n: 55, p: [75, 50, 25], k: [70, 45, 20] } }
             },
             "Trigo": {
-                "3 a 4 t/ha": { v: 55, n: 60, p: [80, 60, 40], k: [70, 50, 30] },
-                "4 a 6 t/ha": { v: 60, n: 100, p: [100, 80, 60], k: [80, 60, 40] }
+                "cerrado": {
+                    "3 a 4 t/ha": { v: 55, n: 60, p: [80, 60, 40], k: [70, 50, 30] },
+                    "4 a 6 t/ha": { v: 55, n: 100, p: [100, 80, 60], k: [80, 60, 40] }
+                },
+                "5aprox": { "3,0 a 5,0 t/ha": { v: 50, n: 60, p: [60, 60, 60], k: [30, 30, 30] } }
             },
             "Mandioca": {
-                "20 a 30 t/ha": { v: 35, n: 30, p: [80, 60, 40], k: [80, 60, 40] },
-                "30 a 40 t/ha": { v: 60, n: 60, p: [100, 80, 60], k: [140, 120, 100] }
+                "cerrado": {
+                    "20 a 30 t/ha": { v: 30, n: 20, p: [80, 60, 40], k: [80, 60, 40] },
+                    "30 a 40 t/ha": { v: 30, n: 60, p: [100, 80, 60], k: [140, 120, 100] }
+                },
+                "5aprox": { "20 t/ha": { v: 40, n: 40, p: [60, 60, 60], k: [40, 40, 40] } }
             },
             "Citros": {
-                "15 a 30 t/ha": { v: 70, n: 110, p: [70, 50, 30], k: [120, 80, 40] },
-                "30 a 45 t/ha": { v: 70, n: 170, p: [110, 90, 70], k: [180, 150, 120] }
+                "cerrado": {
+                    "15 a 30 t/ha": { v: 50, n: 110, p: [70, 50, 30], k: [120, 80, 40] },
+                    "30 a 45 t/ha": { v: 50, n: 170, p: [110, 90, 70], k: [180, 150, 120] }
+                },
+                "5aprox": {
+                    "15 a 30 t/ha": { v: 70, n: 130, p: [80, 50, 25], k: [110, 70, 35] },
+                    "30 a 45 t/ha": { v: 70, n: 190, p: [120, 75, 40], k: [170, 110, 50] }
+                }
             },
             "Banana": {
-                "15 a 25 t/ha": { v: 70, n: 200, p: [100, 60, 30], k: [400, 300, 200] },
-                "25 a 40 t/ha": { v: 70, n: 325, p: [130, 90, 60], k: [600, 500, 400] }
+                "cerrado": {
+                    "15 a 25 t/ha": { v: 50, n: 200, p: [100, 60, 30], k: [400, 300, 200] },
+                    "25 a 40 t/ha": { v: 50, n: 325, p: [130, 90, 60], k: [600, 500, 400] }
+                },
+                "5aprox": { "15 a 25 t/ha": { v: 70, n: 340, p: [180, 120, 60], k: [540, 360, 180] } }
             },
             "Manga": {
-                "5 a 10 t/ha": { v: 60, n: 60, p: [60, 40, 20], k: [80, 60, 30] },
-                "10 a 20 t/ha": { v: 60, n: 120, p: [100, 80, 60], k: [120, 90, 60] }
+                "cerrado": {
+                    "5 a 10 t/ha": { v: 50, n: 60, p: [60, 40, 20], k: [80, 60, 30] },
+                    "10 a 20 t/ha": { v: 50, n: 120, p: [100, 80, 60], k: [120, 90, 60] }
+                },
+                "5aprox": { "10 t/ha": { v: 60, n: 350, p: [150, 100, 50], k: [360, 240, 120] } }
             },
-            "Mamão": { "50 t/ha": { v: 80, n: 80, p: [30, 20, 10], k: [90, 60, 30] } },
-            "Maracujá": { "2ª safra": { v: 70, n: 140, p: [90, 60, 30], k: [270, 180, 90] } },
-            "Batata": { "30 t/ha": { v: 60, n: 190, p: [420, 300, 120], k: [350, 220, 150] } },
-            "Tomate": { "100 t/ha": { v: 75, n: 400, p: [900, 800, 600], k: [800, 600, 400] } },
-            "Alface": { "21 t/ha": { v: 70, n: 150, p: [400, 300, 100], k: [120, 90, 60] } },
-            "Cebola": { "25 t/ha": { v: 70, n: 120, p: [300, 220, 100], k: [180, 120, 50] } },
-            "Cenoura": { "35 a 40 t/ha": { v: 65, n: 120, p: [320, 240, 160], k: [320, 240, 160] } },
-            "Repolho": { "50 t/ha": { v: 70, n: 150, p: [400, 300, 100], k: [240, 180, 100] } },
-            "Pimentão": { "30 t/ha": { v: 70, n: 100, p: [200, 160, 120], k: [160, 120, 80] } },
-            "Pepino": { "30 a 35 t/ha": { v: 75, n: 150, p: [180, 150, 120], k: [120, 100, 80] } },
-            "Abóbora": { "15 a 18 t/ha": { v: 70, n: 100, p: [160, 120, 80], k: [120, 90, 60] } },
-            "Pastagens": { "Manutenção": { v: 45, n: 125, p: [40, 25, 0], k: [100, 40, 0] } }
+            "Mamão": {
+                "cerrado": { "50 t/ha": { v: 80, n: 80, p: [30, 20, 10], k: [90, 60, 30] } },
+                "5aprox": { "50 t/ha": { v: 80, n: 80, p: [30, 20, 10], k: [90, 60, 30] } }
+            },
+            "Maracujá": {
+                "cerrado": { "2ª safra": { v: 70, n: 140, p: [90, 60, 30], k: [270, 180, 90] } },
+                "5aprox": { "2ª safra": { v: 70, n: 140, p: [90, 60, 30], k: [270, 180, 90] } }
+            },
+            "Batata": {
+                "cerrado": { "30 t/ha": { v: 60, n: 190, p: [420, 300, 120], k: [350, 220, 150] } },
+                "5aprox": { "30 t/ha": { v: 60, n: 190, p: [420, 300, 120], k: [350, 220, 150] } }
+            },
+            "Tomate": {
+                "cerrado": { "100 t/ha": { v: 75, n: 400, p: [900, 800, 600], k: [800, 600, 400] } },
+                "5aprox": { "100 t/ha": { v: 75, n: 400, p: [900, 800, 600], k: [800, 600, 400] } }
+            },
+            "Alface": {
+                "cerrado": { "21 t/ha": { v: 70, n: 150, p: [400, 300, 100], k: [120, 90, 60] } },
+                "5aprox": { "21 t/ha": { v: 70, n: 150, p: [400, 300, 100], k: [120, 90, 60] } }
+            },
+            "Cebola": {
+                "cerrado": { "25 t/ha": { v: 70, n: 120, p: [300, 220, 100], k: [180, 120, 50] } },
+                "5aprox": { "25 t/ha": { v: 70, n: 120, p: [300, 220, 100], k: [180, 120, 50] } }
+            },
+            "Cenoura": {
+                "cerrado": { "35 a 40 t/ha": { v: 65, n: 120, p: [320, 240, 160], k: [320, 240, 160] } },
+                "5aprox": { "35 a 40 t/ha": { v: 65, n: 120, p: [320, 240, 160], k: [320, 240, 160] } }
+            },
+            "Repolho": {
+                "cerrado": { "50 t/ha": { v: 70, n: 150, p: [400, 300, 100], k: [240, 180, 100] } },
+                "5aprox": { "50 t/ha": { v: 70, n: 150, p: [400, 300, 100], k: [240, 180, 100] } }
+            },
+            "Pimentão": {
+                "cerrado": { "30 t/ha": { v: 70, n: 100, p: [200, 160, 120], k: [160, 120, 80] } },
+                "5aprox": { "30 t/ha": { v: 70, n: 100, p: [200, 160, 120], k: [160, 120, 80] } }
+            },
+            "Pepino": {
+                "cerrado": { "30 a 35 t/ha": { v: 75, n: 150, p: [180, 150, 120], k: [120, 100, 80] } },
+                "5aprox": { "30 a 35 t/ha": { v: 75, n: 150, p: [180, 150, 120], k: [120, 100, 80] } }
+            },
+            "Abóbora": {
+                "cerrado": { "15 a 18 t/ha": { v: 70, n: 100, p: [160, 120, 80], k: [120, 90, 60] } },
+                "5aprox": { "15 a 18 t/ha": { v: 70, n: 100, p: [160, 120, 80], k: [120, 90, 60] } }
+            },
+            "Pastagens": {
+                "cerrado": { "Manutenção": { v: 45, n: 125, p: [40, 25, 0], k: [100, 40, 0] } },
+                "5aprox": { "Manutenção": { v: 45, n: 125, p: [40, 25, 0], k: [100, 40, 0] } }
+            }
         };
 
         const dbMomentoN = {
@@ -444,13 +580,11 @@
 
         // VALIDAÇÃO DE SENHA E INICIALIZAÇÃO
         document.addEventListener("DOMContentLoaded", () => {
-            // Verifica o token de acesso
             const isAuth = localStorage.getItem('agrosolo_auth');
             if (isAuth === 'true') {
                 document.getElementById('login-overlay').style.display = 'none';
             }
 
-            // Carrega Estados do IBGE
             fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome')
                 .then(response => response.json())
                 .then(estados => {
@@ -480,19 +614,20 @@
                 });
         }
 
-        // Atualização Dinâmica do Select de Produtividade Baseado na Cultura
+        // Atualização Dinâmica do Select de Produtividade Baseado na Cultura e Manual Selecionado
         function atualizarUnidadeProdutividade() {
             const cultura = document.getElementById('cult_cultura').value;
+            const manual = document.getElementById('config_manual').value;
             const selectProd = document.getElementById('cult_produtividade');
             
             selectProd.innerHTML = '';
             
-            if (!cultura || !dbAgroSolo[cultura]) {
-                selectProd.innerHTML = '<option value="">Selecione a cultura primeiro...</option>';
+            if (!cultura || !dbAgroSolo[cultura] || !dbAgroSolo[cultura][manual]) {
+                selectProd.innerHTML = '<option value="">Selecione Cultura compatível...</option>';
                 return;
             }
 
-            const faixas = Object.keys(dbAgroSolo[cultura]);
+            const faixas = Object.keys(dbAgroSolo[cultura][manual]);
             faixas.forEach(faixa => {
                 let option = document.createElement('option');
                 option.value = faixa;
@@ -512,12 +647,21 @@
             document.getElementById('id_area').value = "";
             const inputs = ['s_argila','s_mo','s_ph','s_al','s_hal','s_p','s_k','s_ca','s_mg','s_s','s_b','s_cu','s_fe','s_mn','s_zn', 'v_personalizado'];
             inputs.forEach(id => document.getElementById(id).value = "");
-            nextStep(2); 
+            nextStep(2);
         }
 
-        // MOTOR AGRONÔMICO AVANÇADO (AGROSOLO - BASE PDF EMBRAPA / 5ª APROX)
+        // Encerra e limpa tudo para começar nova propriedade
+        function resetarPropriedade() {
+            if(confirm("Deseja realmente encerrar a interpretação desta propriedade e iniciar uma nova? Todos os laudos gerados não impressos serão perdidos.")) {
+                document.getElementById('agroForm').reset();
+                document.getElementById('container-laudos').innerHTML = '';
+                document.getElementById('cult_produtividade').innerHTML = '<option value="">Aguardando Cultura...</option>';
+                nextStep(1);
+            }
+        }
+
+        // MOTOR AGRONÔMICO AVANÇADO (Base Ajustada 5ª Aprox / Cerrado)
         function processarTalhao() {
-            // 1. Dados Base
             const manual = document.getElementById('config_manual').value;
             const cultura = document.getElementById('cult_cultura').value;
             const prod = document.getElementById('cult_produtividade').value;
@@ -529,7 +673,6 @@
                 return nextStep(2);
             }
 
-            // 2. Variaveis do Solo
             const p = parseFloat(document.getElementById('s_p').value) || 0;
             const k = parseFloat(document.getElementById('s_k').value) || 0;
             const ca = parseFloat(document.getElementById('s_ca').value) || 0;
@@ -549,39 +692,59 @@
             const ctc_T = sb + hal;
             const v_atual = ctc_T > 0 ? (sb / ctc_T) * 100 : 0;
 
-            // 3. CLASSIFICAÇÃO NÍVEIS CRÍTICOS (Baseado no PDF)
+            // Função de Classificação Genérica
             function classificar(valor, deficiente, adequado) {
                 if(valor <= deficiente) return { status: 0, html: `<span class="status-baixo">Baixo</span>` };
-                if(valor > adequado) return { status: 2, html: `<span class="status-alto">Adequado/Alto</span>` };
+                if(valor >= adequado) return { status: 2, html: `<span class="status-alto">Adequado/Alto</span>` };
                 return { status: 1, html: `<span class="status-medio">Médio</span>` };
             }
 
-            // Nível de Fósforo (Baseado em Argila/Textura do PDF)
-            let st_P;
-            if (argila > 60) st_P = classificar(p, 5.4, 8.0);
-            else if (argila >= 35) st_P = classificar(p, 8.0, 12.0);
-            else if (argila >= 15) st_P = classificar(p, 12.0, 20.0);
-            else st_P = classificar(p, 20.0, 30.0);
+            let st_P, st_K, st_Ca, st_Mg, st_S, st_B, st_Cu, st_Fe, st_Mn, st_Zn;
 
-            // Nível de Potássio
-            let st_K = classificar(k, 40, 70);
-            
-            // Outros Macros
-            let st_Ca = classificar(ca, 1.20, 2.40);
-            let st_Mg = classificar(mg, 0.45, 0.90);
-            let st_S = classificar(s, 5.0, 7.0);
-            
-            // Micronutrientes
-            let st_B = classificar(b, 0.35, 0.60);
-            let st_Cu = classificar(cu, 0.7, 1.2);
-            let st_Fe = classificar(fe, 18, 30);
-            let st_Mn = classificar(mn, 2, 5);
-            let st_Zn = classificar(zn, 0.9, 1.5);
+            // CLASSIFICAÇÃO NÍVEIS CRÍTICOS (Distinção por Manual)
+            if (manual === "5aprox") {
+                // Fósforo 5ª Aproximação
+                if (argila > 60) st_P = classificar(p, 5.4, 8.1);
+                else if (argila >= 35) st_P = classificar(p, 8.0, 12.1);
+                else if (argila >= 15) st_P = classificar(p, 12.0, 20.1);
+                else st_P = classificar(p, 20.0, 30.1);
 
-            // 4. LÓGICA DE DOSAGEM EXATA E V%
-            const dadosCult = dbAgroSolo[cultura][prod];
-            
-            // Gerenciamento da Saturação por Bases (V%)
+                // Macros 5ª Aproximação
+                st_K = classificar(k, 40, 71);
+                st_Ca = classificar(ca, 1.20, 2.41);
+                st_Mg = classificar(mg, 0.45, 0.91);
+                st_S = classificar(s, 5.0, 7.0);
+
+                // Micros 5ª Aproximação
+                st_Zn = classificar(zn, 0.9, 1.6);
+                st_B = classificar(b, 0.35, 0.61);
+                st_Cu = classificar(cu, 0.7, 1.3);
+                st_Mn = classificar(mn, 5, 9);
+                st_Fe = classificar(fe, 18, 31);
+
+            } else { 
+                // Fósforo Cerrado (Embrapa)
+                if (argila > 60) st_P = classificar(p, 2.8, 4.1);
+                else if (argila >= 36) st_P = classificar(p, 5.5, 8.1);
+                else if (argila >= 16) st_P = classificar(p, 10.0, 15.1);
+                else st_P = classificar(p, 12.0, 18.1);
+
+                // Macros Cerrado (Embrapa)
+                st_K = classificar(k, 30, 51);
+                st_Ca = classificar(ca, 1.0, 2.6);
+                st_Mg = classificar(mg, 0.2, 0.6);
+                st_S = classificar(s, 4.0, 10.0);
+
+                // Micros Cerrado (Embrapa)
+                st_Zn = classificar(zn, 1.0, 1.51);
+                st_B = classificar(b, 0.2, 0.51);
+                st_Cu = classificar(cu, 0.4, 0.81);
+                st_Mn = classificar(mn, 2.0, 5.1);
+                st_Fe = classificar(fe, 18, 31); 
+            }
+
+            const dadosCult = dbAgroSolo[cultura][manual][prod];
+
             let v_alvo_manual = dadosCult.v;
             let v_personalizado_input = document.getElementById('v_personalizado').value;
             let v_alvo_pessoal = v_personalizado_input ? parseFloat(v_personalizado_input) : null;
@@ -591,7 +754,7 @@
             let req_P2O5 = dadosCult.p[st_P.status]; // Pega array [Baixo, Médio, Adequado]
             let req_K2O = dadosCult.k[st_K.status];
 
-            // 5. CÁLCULO DE CALCÁRIO
+            // CÁLCULO DE CALCÁRIO
             let nc = 0;
             if(document.getElementById('calc_metodo').value === "v_bases") {
                 if(v_atual < v_alvo_calculo && ctc_T > 0) nc = ((v_alvo_calculo - v_atual) * ctc_T) / prnt;
@@ -602,7 +765,7 @@
             nc = nc < 0 ? 0 : nc;
             let tipo_calc = (mg < 0.9 || (ca/mg) > 4) ? "Dolomítico (Foco em Magnésio)" : "Calcítico (Foco em Cálcio)";
 
-            // 6. CÁLCULO FÍSICO DOS ADUBOS
+            // CÁLCULO FÍSICO DOS ADUBOS
             const f_P = document.getElementById('fonte_p').value;
             const f_K = document.getElementById('fonte_k').value;
             const f_N = document.getElementById('fonte_n').value;
@@ -620,7 +783,6 @@
             let rec_fund = `- ${Math.ceil(qtd_P)} kg/ha de ${f_P}\n`;
             let rec_cob = "";
             let momento_aplicacao_N = "Parcelar em cobertura conforme recomendação técnica padrão da cultura.";
-
             if (dbMomentoN[cultura]) {
                 momento_aplicacao_N = dbMomentoN[cultura][manual] || dbMomentoN[cultura]["5aprox"];
             }
@@ -629,22 +791,23 @@
                 rec_fund += `- 80 kg/ha de KCl\n`;
                 rec_cob += `- ${Math.ceil(qtd_K - 80)} kg/ha de KCl (Cobertura)\n`;
             } else if(qtd_K > 0) { 
-                rec_fund += `- ${Math.ceil(qtd_K)} kg/ha de KCl\n`; 
+                rec_fund += `- ${Math.ceil(qtd_K)} kg/ha de KCl\n`;
             }
 
             if(cultura === "Soja") {
                 rec_fund += `- Inoculação das sementes recomendada.\n`;
             } else if (qtd_N > 0) {
-                let n_fund = Math.min(qtd_N, 80); // Limite no sulco
+                let n_fund = Math.min(qtd_N, 80);
                 rec_fund += `- ${Math.ceil(n_fund)} kg/ha de ${f_N}\n`;
                 if(qtd_N > n_fund) rec_cob += `- ${Math.ceil(qtd_N - n_fund)} kg/ha de ${f_N} (Fracionar Cobertura)\n`;
             }
 
-            // 7. MONTAGEM DO LAUDO
+            // MONTAGEM DO LAUDO
             const laudoHTML = `
                 <div class="laudo-card">
                     <h3 style="margin-top:0;">🚜 TALHÃO: ${talhao.toUpperCase()}</h3>
-                    <p><strong>Cultura:</strong> ${document.getElementById('cult_cultura').options[document.getElementById('cult_cultura').selectedIndex].text} | <strong>Produtividade Alvo:</strong> ${prod}</p>
+                    <p><strong>Cultura:</strong> ${document.getElementById('cult_cultura').options[document.getElementById('cult_cultura').selectedIndex].text} |
+                    <strong>Produtividade Alvo:</strong> ${prod}</p>
                     <p><strong>Base Técnica (Adubação/Calagem):</strong> ${document.getElementById('config_manual').options[document.getElementById('config_manual').selectedIndex].text}</p>
                     <hr style="margin: 15px 0; border: 0; border-top: 1px dashed #ccc;">
                     
@@ -664,7 +827,7 @@
                             <div><strong>Zinco (Zn):</strong> ${zn} mg/dm³ -> ${st_Zn.html}</div>
                         </div>
                         <p style="margin-top:10px;">
-                            <strong>Saturação por Bases (V%):</strong> Atual: ${v_atual.toFixed(1)}% | 
+                            <strong>Saturação por Bases (V%):</strong> Atual: ${v_atual.toFixed(1)}% |
                             <strong>Alvo do Manual:</strong> ${v_alvo_manual}% 
                             ${v_alvo_pessoal !== null ? `| <strong>Alvo Pessoal (Aplicado):</strong> ${v_alvo_pessoal}%` : ''}
                         </p>
@@ -698,9 +861,12 @@
 
                         <p style="font-size:10pt; color:#666; margin-top:10px;">* Se micronutrientes constam como Baixos, aplicar fontes solúveis via foliar ou adicionados aos formulados de solo.</p>
                     </div>
+
+                    <div style="text-align: right; margin-top: 15px;" class="no-print">
+                        <button type="button" class="btn-danger" onclick="this.closest('.laudo-card').remove()">🗑️ Remover Talhão</button>
+                    </div>
                 </div>
             `;
-
             document.getElementById('container-laudos').insertAdjacentHTML('beforeend', laudoHTML);
             nextStep(5);
         }
@@ -709,7 +875,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
     const firebaseConfig = {
         apiKey: "AIzaSyAA47f1gCMH4nqFaM2y-RTMvDhYrMK28wI",
         authDomain: "agrosoloapp.firebaseapp.com",
@@ -718,11 +883,9 @@
         messagingSenderId: "695468583546",
         appId: "1:695468583546:web:1934f3501a8f0cb83429c3"
     };
-
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-
     document.getElementById('btn-login').addEventListener('click', async () => {
         const email = document.getElementById('email-acesso').value.trim();
         const senha = document.getElementById('senha-acesso').value.trim();
@@ -742,6 +905,7 @@
 
             const userCredential = await signInWithEmailAndPassword(auth, email, senha);
             const user = userCredential.user;
+ 
             const userDocRef = doc(db, "usuarios", user.uid);
             const userDoc = await getDoc(userDocRef);
 
