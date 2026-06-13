@@ -167,6 +167,14 @@
     </div>
     <div class="app-container">
         <h1>🌾 AgroSolo 🌾</h1>
+<div id="painel-sessao" style="display: none; justify-content: space-between; align-items: center; background: #FFF3E0; padding: 10px 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #FFB300;">
+    <div style="font-size: 11pt; font-weight: bold; color: #5D4037;">
+        ⏳ Sessão expira em: <span id="timer-display" style="color: #C62828;">30:00</span>
+    </div>
+    <button type="button" id="btn-logout" style="background: #C62828; color: white; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; cursor: pointer;">
+        🚪 Sair e Liberar Vaga
+    </button>
+</div>
         <p style="text-align: center; margin-bottom: 20px; color: var(--brown-medium);">Sistema Especialista de Interpretação e Recomendação</p>
         
         <div class="progress-container">
@@ -874,7 +882,9 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    // Configurações do AgroSolo
     const firebaseConfig = {
         apiKey: "AIzaSyAA47f1gCMH4nqFaM2y-RTMvDhYrMK28wI",
         authDomain: "agrosoloapp.firebaseapp.com",
@@ -883,9 +893,95 @@
         messagingSenderId: "695468583546",
         appId: "1:695468583546:web:1934f3501a8f0cb83429c3"
     };
+
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+
+    // ==========================================
+    // SISTEMA DE TEMPORIZADOR E LIBERAÇÃO DE VAGA
+    // ==========================================
+    let timerInterval;
+    let tempoInatividade = 1800; // 30 minutos em segundos
+
+    function iniciarTimer() {
+        clearInterval(timerInterval);
+        tempoInatividade = 1800; // Reseta sempre para 30 min
+        document.getElementById('painel-sessao').style.display = 'flex';
+
+        timerInterval = setInterval(() => {
+            tempoInatividade--;
+            let minutos = Math.floor(tempoInatividade / 60);
+            let segundos = tempoInatividade % 60;
+            
+            // Atualiza o relógio na tela
+            document.getElementById('timer-display').innerText = 
+                `${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
+
+            // Se o tempo acabar, força o logout
+            if (tempoInatividade <= 0) {
+                clearInterval(timerInterval);
+                alert("Sessão encerrada por inatividade para liberar a vaga.");
+                deslogarELiberarVaga();
+            }
+        }, 1000);
+    }
+
+    // Reseta o relógio toda vez que o usuário clica na tela (usando o app)
+    document.addEventListener('click', () => {
+        if (localStorage.getItem('agrosolo_auth') === 'true') {
+            iniciarTimer();
+        }
+    });
+
+    // Função que remove o aparelho do Firebase e desloga
+    async function deslogarELiberarVaga() {
+        const user = auth.currentUser;
+        const deviceId = localStorage.getItem('agrosolo_device_id');
+
+        // Se o usuário estiver logado, remove a vaga do banco
+        if (user && deviceId) {
+            try {
+                const userDocRef = doc(db, "usuarios", user.uid);
+                const userDoc = await getDoc(userDocRef);
+                
+                if (userDoc.exists()) {
+                    let sessoesAtivas = userDoc.data().sessoes || [];
+                    // Filtra a lista, removendo apenas o ID deste aparelho
+                    let novasSessoes = sessoesAtivas.filter(id => id !== deviceId);
+                    
+                    // Atualiza o Firebase com a vaga livre
+                    await updateDoc(userDocRef, { sessoes: novasSessoes });
+                }
+            } catch (error) {
+                console.error("Erro ao liberar vaga no Firebase:", error);
+            }
+        }
+
+        // Limpa tudo e volta para a tela de login
+        await signOut(auth);
+        localStorage.removeItem('agrosolo_auth');
+        clearInterval(timerInterval);
+        document.getElementById('painel-sessao').style.display = 'none';
+        document.getElementById('login-overlay').style.display = 'flex';
+        document.getElementById('email-acesso').value = '';
+        document.getElementById('senha-acesso').value = '';
+    }
+
+    // Atrela a função ao botão de sair
+    document.getElementById('btn-logout').addEventListener('click', (e) => {
+        e.preventDefault(); // Evita recarregar a página
+        deslogarELiberarVaga();
+    });
+
+    // Se o usuário recarregar a página e já estiver logado, exibe o painel
+    if (localStorage.getItem('agrosolo_auth') === 'true') {
+        iniciarTimer();
+    }
+
+    // ==========================================
+    // SISTEMA DE LOGIN E CONTROLE DE LIMITES
+    // ==========================================
     document.getElementById('btn-login').addEventListener('click', async () => {
         const email = document.getElementById('email-acesso').value.trim();
         const senha = document.getElementById('senha-acesso').value.trim();
@@ -905,18 +1001,47 @@
 
             const userCredential = await signInWithEmailAndPassword(auth, email, senha);
             const user = userCredential.user;
- 
+            
             const userDocRef = doc(db, "usuarios", user.uid);
             const userDoc = await getDoc(userDocRef);
 
             if (userDoc.exists()) {
-                const prazoAcessoStr = userDoc.data().prazo;
+                const dadosUsuario = userDoc.data();
+                const prazoAcessoStr = dadosUsuario.prazo;
+                const limiteAcessos = dadosUsuario.limite_acessos ? parseInt(dadosUsuario.limite_acessos, 10) : 1;
+
                 if (prazoAcessoStr) {
                     const dataExpiracao = new Date(prazoAcessoStr + "T23:59:59");
+                    
                     if (new Date() <= dataExpiracao) {
-                        // Prazo válido: Fecha a tela de login
-                        document.getElementById('login-overlay').style.display = 'none';
-                        localStorage.setItem('agrosolo_auth', 'true');
+                        
+                        let sessoesAtivas = dadosUsuario.sessoes || [];
+                        let deviceId = localStorage.getItem('agrosolo_device_id');
+                        
+                        if (!deviceId) {
+                            deviceId = 'device_' + Math.random().toString(36).substring(2, 11);
+                            localStorage.setItem('agrosolo_device_id', deviceId);
+                        }
+
+                        if (sessoesAtivas.includes(deviceId)) {
+                            document.getElementById('login-overlay').style.display = 'none';
+                            localStorage.setItem('agrosolo_auth', 'true');
+                            iniciarTimer(); // Inicia o relógio
+                        } 
+                        else if (sessoesAtivas.length < limiteAcessos) {
+                            sessoesAtivas.push(deviceId);
+                            await updateDoc(userDocRef, { sessoes: sessoesAtivas }); 
+                            
+                            document.getElementById('login-overlay').style.display = 'none';
+                            localStorage.setItem('agrosolo_auth', 'true');
+                            iniciarTimer(); // Inicia o relógio
+                        } 
+                        else {
+                            await signOut(auth);
+                            msgErro.innerText = `Acesso negado: Limite de ${limiteAcessos} aparelho(s) atingido. Deslogue de outro dispositivo.`;
+                            msgErro.style.display = "block";
+                        }
+
                     } else {
                         await signOut(auth);
                         msgErro.innerText = "Acesso negado: Seu prazo expirou.";
@@ -934,7 +1059,11 @@
             }
         } catch (error) {
             msgErro.style.display = "block";
-            msgErro.innerText = "E-mail ou senha incorretos.";
+            if (error.code === 'permission-denied') {
+                msgErro.innerText = "Erro: Sem permissão no Firebase. Ajuste as Regras (Rules).";
+            } else {
+                msgErro.innerText = "E-mail ou senha incorretos.";
+            }
         } finally {
             btnLogin.innerText = "Entrar";
             btnLogin.disabled = false;
